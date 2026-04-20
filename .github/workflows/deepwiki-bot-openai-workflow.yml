@@ -172,11 +172,27 @@ jobs:
               return content.filter(c => c.type === 'text').map(c => c.text).join('\n');
             }
 
-            // ── Groq with retry ──────────────────────────────────────────────
-            async function callGroq(issueTitle, issueBody, deepwikiContext, retries = 2) {
+            // ── Groq with retry + conversation history ───────────────────────
+            async function callGroq(issueTitle, originalIssueBody, followUpQuestion, deepwikiContext, history = [], retries = 2) {
               const systemPrompt = deepwikiContext
-                ? `You are a helpful, friendly GitHub bot for the ${repoName} repository. Use this DeepWiki documentation context to answer:\n\n${deepwikiContext}`
-                : `You are a helpful GitHub bot for the ${repoName} repository. DeepWiki context was unavailable — answer from general knowledge and be honest about uncertainty.`;
+                ? `You are a helpful, friendly GitHub bot for the ${repoName} repository. Use this DeepWiki documentation context to answer:\n\n${deepwikiContext}\n\nYou have access to the original issue description and full conversation history. Use them to understand context and follow-up references like "those modes" or "the second option you mentioned".`
+                : `You are a helpful GitHub bot for the ${repoName} repository. DeepWiki context was unavailable — answer from general knowledge and be honest about uncertainty. Use the original issue and conversation history for context.`;
+
+              const isFollowUp = history.length > 0;
+
+              // Build messages: system + original issue + comment history + follow-up
+              const messages = [
+                { role: 'system', content: systemPrompt },
+                // Always include original issue so bot knows the full problem
+                { role: 'user', content: `Issue Title: ${issueTitle}\n\nOriginal Issue Description:\n${originalIssueBody || '(no description provided)'}` },
+                // Inject prior comments as conversation turns
+                ...history,
+                // Final instruction
+                ...(isFollowUp
+                  ? [{ role: 'user', content: `Follow-up question: ${followUpQuestion}\n\nWrite a helpful GitHub comment using the original issue and conversation above for full context. Use markdown. End with a note that you are an AI bot powered by DeepWiki + Groq. All responses must be in English.` }]
+                  : [{ role: 'user', content: `Write a helpful GitHub comment answering this issue. Use markdown. End with a note that you are an AI bot powered by DeepWiki + Groq and invite follow-up questions by quote-replying. All responses must be in English.` }]
+                )
+              ];
 
               for (let attempt = 1; attempt <= retries; attempt++) {
                 try {
@@ -189,10 +205,7 @@ jobs:
                     body: JSON.stringify({
                       model: 'llama-3.3-70b-versatile',
                       max_tokens: 1024,
-                      messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: `Issue Title: ${issueTitle}\n\nIssue Body:\n${issueBody || '(no body provided)'}\n\nWrite a helpful GitHub comment. Use markdown. End with a note that you are an AI bot powered by DeepWiki + Groq and invite follow-up questions. All responses must be in English.` }
-                      ]
+                      messages
                     })
                   }, 20000);
 
@@ -228,6 +241,40 @@ jobs:
 
               const question = `${issueTitle}\n\n${issueBody}`.trim();
 
+              // Fetch original issue body + conversation history for follow-up context
+              let conversationHistory = [];
+              let originalIssueBody = issueBody; // for new issues this is already set
+              if (isComment) {
+                try {
+                  // Always fetch the original issue so bot knows what the problem is
+                  const { data: issueData } = await github.rest.issues.get({
+                    owner: context.repo.owner,
+                    repo:  context.repo.repo,
+                    issue_number: issueNumber
+                  });
+                  originalIssueBody = cleanIssueBody(issueData.body || '');
+                  console.log('Original issue body preview:', originalIssueBody.slice(0, 200));
+
+                  const { data: allComments } = await github.rest.issues.listComments({
+                    owner: context.repo.owner,
+                    repo:  context.repo.repo,
+                    issue_number: issueNumber,
+                    per_page: 20
+                  });
+                  // Build chat history — exclude the placeholder we just posted
+                  conversationHistory = allComments
+                    .filter(c => c.id !== placeholder.data.id)
+                    .map(c => ({
+                      role: c.user.login === 'github-actions[bot]' ? 'assistant' : 'user',
+                      // Strip bot footer lines and markdown hr for cleaner history
+                      content: c.body.replace(/\n---\n_.*_$/s, '').trim()
+                    }));
+                  console.log(`Loaded ${conversationHistory.length} previous comments for context`);
+                } catch (err) {
+                  console.warn('Could not fetch issue/comment history:', err.message);
+                }
+              }
+
               let deepwikiContext = '';
               try {
                 deepwikiContext = await askDeepWiki(question);
@@ -237,7 +284,10 @@ jobs:
                 console.warn('DeepWiki fetch failed, continuing without context:', err.message);
               }
 
-              const answer = await callGroq(issueTitle, issueBody, deepwikiContext);
+              // For new issues: originalIssueBody = issueBody, no follow-up question
+              // For comments: originalIssueBody = fetched issue, followUp = what user typed
+              const followUp = isComment ? issueBody : '';
+              const answer = await callGroq(issueTitle, originalIssueBody, followUp, deepwikiContext, conversationHistory);
 
               const contextNote = deepwikiContext
                 ? '_✅ Powered by DeepWiki + Groq — answer based on actual repo documentation._'

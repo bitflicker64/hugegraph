@@ -28,16 +28,41 @@ jobs:
 
             console.log(`Processing issue #${issueNumber}: ${issueTitle}`);
 
+            // Parse SSE or plain JSON response from DeepWiki
+            function parseMCPResponse(text) {
+              // If it's SSE format (starts with "event:" or "data:")
+              if (text.trimStart().startsWith('event:') || text.trimStart().startsWith('data:')) {
+                const lines = text.split('\n');
+                for (const line of lines) {
+                  const trimmed = line.trim();
+                  if (trimmed.startsWith('data:')) {
+                    const jsonStr = trimmed.slice(5).trim();
+                    if (!jsonStr || jsonStr === '[DONE]') continue;
+                    try {
+                      return JSON.parse(jsonStr);
+                    } catch (e) {
+                      continue;
+                    }
+                  }
+                }
+                throw new Error('No valid JSON-RPC response found in SSE stream');
+              }
+              // Otherwise plain JSON
+              return JSON.parse(text);
+            }
+
             // ── 1. Ask DeepWiki MCP ─────────────────────────────────────────
             async function askDeepWiki(owner, repo, question) {
               const url = 'https://mcp.deepwiki.com/mcp';
+              const baseHeaders = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json, text/event-stream'
+              };
 
+              // Initialize session
               const initRes = await fetch(url, {
                 method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Accept': 'application/json, text/event-stream'
-                },
+                headers: baseHeaders,
                 body: JSON.stringify({
                   jsonrpc: '2.0',
                   id: 1,
@@ -54,13 +79,16 @@ jobs:
                 throw new Error(`DeepWiki init failed: ${initRes.status} ${await initRes.text()}`);
               }
 
+              const initText = await initRes.text();
+              console.log('Init response:', initText.slice(0, 300));
+              const initData = parseMCPResponse(initText);
+              console.log('Init parsed:', JSON.stringify(initData));
+
               const sessionId = initRes.headers.get('mcp-session-id');
-              const headers = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json, text/event-stream'
-              };
+              const headers = { ...baseHeaders };
               if (sessionId) headers['mcp-session-id'] = sessionId;
 
+              // Call ask_question tool
               const toolRes = await fetch(url, {
                 method: 'POST',
                 headers,
@@ -75,8 +103,10 @@ jobs:
                 })
               });
 
-              const toolData = await toolRes.json();
-              console.log('DeepWiki raw response:', JSON.stringify(toolData, null, 2));
+              const toolText = await toolRes.text();
+              console.log('Tool response preview:', toolText.slice(0, 500));
+              const toolData = parseMCPResponse(toolText);
+              console.log('Tool parsed result keys:', Object.keys(toolData));
 
               if (toolData.error) {
                 throw new Error(`DeepWiki error: ${JSON.stringify(toolData.error)}`);
@@ -87,7 +117,7 @@ jobs:
             }
 
             // ── 2. Polish with Groq ─────────────────────────────────────────
-            async function polishWithOpenAI(issueTitle, issueBody, deepwikiAnswer) {
+            async function polishWithGroq(issueTitle, issueBody, deepwikiAnswer) {
               const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
                 headers: {
@@ -111,7 +141,7 @@ jobs:
               });
 
               const data = await res.json();
-              if (data.error) throw new Error(`OpenAI error: ${JSON.stringify(data.error)}`);
+              if (data.error) throw new Error(`Groq error: ${JSON.stringify(data.error)}`);
               return data.choices?.[0]?.message?.content ?? '';
             }
 
@@ -130,11 +160,12 @@ jobs:
               try {
                 deepwikiContext = await askDeepWiki(repoOwner, repoName, question);
                 console.log('DeepWiki context length:', deepwikiContext.length);
+                console.log('DeepWiki context preview:', deepwikiContext.slice(0, 300));
               } catch (err) {
                 console.warn('DeepWiki fetch failed, continuing without context:', err.message);
               }
 
-              const answer = await polishWithOpenAI(issueTitle, issueBody, deepwikiContext);
+              const answer = await polishWithGroq(issueTitle, issueBody, deepwikiContext);
 
               await github.rest.issues.updateComment({
                 owner:      context.repo.owner,

@@ -82,7 +82,7 @@ jobs:
 
             // ── 2. Polish with OpenAI ───────────────────────────────────────
             async function polishWithOpenAI(issueTitle, issueBody, deepwikiAnswer) {
-              const res = await fetch('https://api.openai.com/v1/chat/completions', {
+              const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                   'Content-Type':  'application/json',

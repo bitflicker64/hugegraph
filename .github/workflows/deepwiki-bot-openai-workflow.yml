@@ -28,6 +28,22 @@ jobs:
 
             console.log(`Processing issue #${issueNumber}: ${issueTitle}`);
 
+            // Test connection - read wiki structure first
+            const structRes = await fetch(url, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({
+                jsonrpc: '2.0',
+                id: 2,
+                method: 'tools/call',
+                params: {
+                  name: 'read_wiki_structure',
+                  arguments: { repoOwner: 'apache', repoName: 'incubator-hugegraph' }
+                }
+              })
+            });
+            const structData = await structRes.json();
+            console.log('Wiki structure:', JSON.stringify(structData, null, 2));
             // ── 1. Ask DeepWiki MCP ─────────────────────────────────────────
             async function askDeepWiki(owner, repo, question) {
               const url = 'https://mcp.deepwiki.com/mcp';

@@ -11,26 +11,23 @@ jobs:
       issues: write
 
     steps:
-      - name: Answer issue with DeepWiki + OpenAI
+      - name: Answer issue with DeepWiki + Groq
         uses: actions/github-script@v7
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          REPO_OWNER: apache
-          REPO_NAME: incubator-hugegraph
+          REPO_NAME: apache/incubator-hugegraph
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const issueNumber = context.issue.number;
             const issueTitle  = context.payload.issue.title;
             const issueBody   = context.payload.issue.body || '';
-            const repoOwner   = process.env.REPO_OWNER;
             const repoName    = process.env.REPO_NAME;
 
             console.log(`Processing issue #${issueNumber}: ${issueTitle}`);
 
             // Parse SSE or plain JSON response from DeepWiki
             function parseMCPResponse(text) {
-              // If it's SSE format (starts with "event:" or "data:")
               if (text.trimStart().startsWith('event:') || text.trimStart().startsWith('data:')) {
                 const lines = text.split('\n');
                 for (const line of lines) {
@@ -38,21 +35,16 @@ jobs:
                   if (trimmed.startsWith('data:')) {
                     const jsonStr = trimmed.slice(5).trim();
                     if (!jsonStr || jsonStr === '[DONE]') continue;
-                    try {
-                      return JSON.parse(jsonStr);
-                    } catch (e) {
-                      continue;
-                    }
+                    try { return JSON.parse(jsonStr); } catch (e) { continue; }
                   }
                 }
                 throw new Error('No valid JSON-RPC response found in SSE stream');
               }
-              // Otherwise plain JSON
               return JSON.parse(text);
             }
 
             // ── 1. Ask DeepWiki MCP ─────────────────────────────────────────
-            async function askDeepWiki(owner, repo, question) {
+            async function askDeepWiki(repo, question) {
               const url = 'https://mcp.deepwiki.com/mcp';
               const baseHeaders = {
                 'Content-Type': 'application/json',
@@ -80,15 +72,13 @@ jobs:
               }
 
               const initText = await initRes.text();
-              console.log('Init response:', initText.slice(0, 300));
-              const initData = parseMCPResponse(initText);
-              console.log('Init parsed:', JSON.stringify(initData));
+              parseMCPResponse(initText); // validate it parsed OK
 
               const sessionId = initRes.headers.get('mcp-session-id');
               const headers = { ...baseHeaders };
               if (sessionId) headers['mcp-session-id'] = sessionId;
 
-              // Call ask_question tool
+              // Call ask_question — repoName is "owner/repo", no separate repoOwner!
               const toolRes = await fetch(url, {
                 method: 'POST',
                 headers,
@@ -98,7 +88,7 @@ jobs:
                   method: 'tools/call',
                   params: {
                     name: 'ask_question',
-                    arguments: { repoOwner: owner, repoName: repo, question }
+                    arguments: { repoName: repo, question }
                   }
                 })
               });
@@ -106,7 +96,6 @@ jobs:
               const toolText = await toolRes.text();
               console.log('Tool response preview:', toolText.slice(0, 500));
               const toolData = parseMCPResponse(toolText);
-              console.log('Tool parsed result keys:', Object.keys(toolData));
 
               if (toolData.error) {
                 throw new Error(`DeepWiki error: ${JSON.stringify(toolData.error)}`);
@@ -158,7 +147,7 @@ jobs:
 
               let deepwikiContext = '';
               try {
-                deepwikiContext = await askDeepWiki(repoOwner, repoName, question);
+                deepwikiContext = await askDeepWiki(repoName, question);
                 console.log('DeepWiki context length:', deepwikiContext.length);
                 console.log('DeepWiki context preview:', deepwikiContext.slice(0, 300));
               } catch (err) {

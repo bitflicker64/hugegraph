@@ -26,21 +26,27 @@ jobs:
 
             console.log(`Processing issue #${issueNumber}: ${issueTitle}`);
 
-            // Parse SSE or plain JSON response from DeepWiki
+            // Parse SSE response - skips pings and notification events, finds the result
             function parseMCPResponse(text) {
-              if (text.trimStart().startsWith('event:') || text.trimStart().startsWith('data:')) {
-                const lines = text.split('\n');
-                for (const line of lines) {
-                  const trimmed = line.trim();
-                  if (trimmed.startsWith('data:')) {
-                    const jsonStr = trimmed.slice(5).trim();
-                    if (!jsonStr || jsonStr === '[DONE]') continue;
-                    try { return JSON.parse(jsonStr); } catch (e) { continue; }
-                  }
+              const lines = text.split('\n');
+              // Collect all data: lines and find the one with a real id (not notifications)
+              for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed.startsWith('data:')) continue;
+                const jsonStr = trimmed.slice(5).trim();
+                if (!jsonStr || jsonStr === '[DONE]') continue;
+                try {
+                  const parsed = JSON.parse(jsonStr);
+                  // Skip notification messages (no id, or method is a notification)
+                  if (parsed.method && !parsed.id) continue;
+                  if (parsed.id !== undefined) return parsed;
+                } catch (e) {
+                  continue;
                 }
-                throw new Error('No valid JSON-RPC response found in SSE stream');
               }
-              return JSON.parse(text);
+              // fallback: try plain JSON
+              try { return JSON.parse(text); } catch (e) {}
+              throw new Error('No valid JSON-RPC response found in SSE stream');
             }
 
             // ── 1. Ask DeepWiki MCP ─────────────────────────────────────────
@@ -72,13 +78,13 @@ jobs:
               }
 
               const initText = await initRes.text();
-              parseMCPResponse(initText); // validate it parsed OK
+              parseMCPResponse(initText);
 
               const sessionId = initRes.headers.get('mcp-session-id');
               const headers = { ...baseHeaders };
               if (sessionId) headers['mcp-session-id'] = sessionId;
 
-              // Call ask_question — repoName is "owner/repo", no separate repoOwner!
+              // Call ask_question
               const toolRes = await fetch(url, {
                 method: 'POST',
                 headers,
@@ -94,7 +100,7 @@ jobs:
               });
 
               const toolText = await toolRes.text();
-              console.log('Tool response preview:', toolText.slice(0, 500));
+              console.log('Tool response preview:', toolText.slice(0, 600));
               const toolData = parseMCPResponse(toolText);
 
               if (toolData.error) {

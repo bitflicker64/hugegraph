@@ -1,8 +1,10 @@
-name: DeepWiki Issue Bot (OpenAI)
+name: DeepWiki Issue Bot
 
 on:
   issues:
     types: [opened]
+  issue_comment:
+    types: [created]
 
 jobs:
   answer-issue:
@@ -19,52 +21,121 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const issueNumber = context.issue.number;
-            const issueTitle  = context.payload.issue.title;
-            const issueBody   = context.payload.issue.body || '';
-            const repoName    = process.env.REPO_NAME;
+            // ── Bot loop guard + quote-reply filter ──────────────────────────
+            const isComment = context.eventName === 'issue_comment';
+            if (isComment) {
+              const commenter = context.payload.comment?.user?.login ?? '';
+              if (commenter === 'github-actions[bot]') {
+                console.log('Skipping — this is a bot comment, ignoring to prevent loop.');
+                return;
+              }
 
-            console.log(`Processing issue #${issueNumber}: ${issueTitle}`);
+              // Only respond to quote-replies (comment body starts with '>')
+              const commentBody = context.payload.comment?.body ?? '';
+              const isQuoteReply = commentBody.trimStart().startsWith('>');
+              if (!isQuoteReply) {
+                console.log('Skipping — comment is not a quote-reply, ignoring.');
+                return;
+              }
 
-            // Parse SSE response - skips pings and notification events, finds the result
+              // Strip the quoted lines (>) so we only send the actual question to DeepWiki
+              // e.g. "> bot's previous answer\n\nmy actual question" → "my actual question"
+              const stripped = commentBody
+                .split('\n')
+                .filter(line => !line.trimStart().startsWith('>'))
+                .join('\n')
+                .trim();
+
+              if (!stripped) {
+                console.log('Skipping — no content after stripping quote lines.');
+                return;
+              }
+            }
+
+            // ── Context: new issue vs reply comment ──────────────────────────
+            const issueNumber = isComment
+              ? context.payload.issue.number
+              : context.issue.number;
+            const issueTitle = context.payload.issue.title;
+            // For comments: strip quoted lines ('>'), only keep what user actually typed
+            const rawBody = isComment
+              ? (context.payload.comment.body || '')
+                  .split('\n')
+                  .filter(line => !line.trimStart().startsWith('>'))
+                  .join('\n')
+                  .trim()
+              : context.payload.issue.body || '';
+
+            // ── Clean issue template boilerplate ─────────────────────────────
+            // Strips Chinese/English template sections so DeepWiki gets a clean question
+            function cleanIssueBody(body) {
+              return body
+                .replace(/##\s*(Environment|环境信息)[\s\S]*?(?=##|$)/gi, '')
+                .replace(/##\s*(Before submit|提交前确认)[\s\S]*?(?=##|$)/gi, '')
+                .replace(/##\s*(Schema|Vertex\/Edge example|问题点|元数据)[\s\S]*?(?=##|$)/gi, '')
+                .replace(/- \[[ x]\].*\n?/g, '')        // checkboxes
+                .replace(/Server Version:.*\n?/g, '')
+                .replace(/Backend:.*\n?/g, '')
+                .replace(/OS:.*\n?/g, '')
+                .replace(/Data Size:.*\n?/g, '')
+                .replace(/N\/A.*\n?/gi, '')
+                .replace(/\n{3,}/g, '\n\n')              // collapse blank lines
+                .trim();
+            }
+
+            const issueBody = cleanIssueBody(rawBody);
+            const repoName  = process.env.REPO_NAME;
+
+            console.log(`Processing ${isComment ? 'comment' : 'issue'} #${issueNumber}: ${issueTitle}`);
+            console.log('Cleaned body preview:', issueBody.slice(0, 200));
+
+            // ── Fetch with timeout ────────────────────────────────────────────
+            async function fetchWithTimeout(url, options, timeoutMs = 35000) {
+              const controller = new AbortController();
+              const timer = setTimeout(() => controller.abort(), timeoutMs);
+              try {
+                const res = await fetch(url, { ...options, signal: controller.signal });
+                return res;
+              } catch (err) {
+                if (err.name === 'AbortError') throw new Error(`Request timed out after ${timeoutMs}ms: ${url}`);
+                throw err;
+              } finally {
+                clearTimeout(timer);
+              }
+            }
+
+            // ── SSE parser ───────────────────────────────────────────────────
             function parseMCPResponse(text) {
               const lines = text.split('\n');
-              // Collect all data: lines and find the one with a real id (not notifications)
               for (const line of lines) {
-                const trimmed = line.trim();
-                if (!trimmed.startsWith('data:')) continue;
-                const jsonStr = trimmed.slice(5).trim();
+                if (line.startsWith(':')) continue;          // ping
+                if (!line.startsWith('data:')) continue;
+                const jsonStr = line.slice(5).trim();
                 if (!jsonStr || jsonStr === '[DONE]') continue;
                 try {
                   const parsed = JSON.parse(jsonStr);
-                  // Skip notification messages (no id, or method is a notification)
-                  if (parsed.method && !parsed.id) continue;
+                  if (parsed.method && !parsed.id) continue; // notification
                   if (parsed.id !== undefined) return parsed;
-                } catch (e) {
-                  continue;
-                }
+                } catch (e) { continue; }
               }
-              // fallback: try plain JSON
               try { return JSON.parse(text); } catch (e) {}
               throw new Error('No valid JSON-RPC response found in SSE stream');
             }
 
-            // ── 1. Ask DeepWiki MCP ─────────────────────────────────────────
-            async function askDeepWiki(repo, question) {
+            // ── DeepWiki MCP ─────────────────────────────────────────────────
+            async function askDeepWiki(question) {
               const url = 'https://mcp.deepwiki.com/mcp';
               const baseHeaders = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json, text/event-stream'
               };
 
-              // Initialize session
-              const initRes = await fetch(url, {
+              // Init session
+              const initRes = await fetchWithTimeout(url, {
                 method: 'POST',
                 headers: baseHeaders,
                 body: JSON.stringify({
-                  jsonrpc: '2.0',
-                  id: 1,
-                  method: 'initialize',
+                  jsonrpc: '2.0', id: 1, method: 'initialize',
                   params: {
                     protocolVersion: '2024-11-05',
                     capabilities: {},
@@ -73,105 +144,116 @@ jobs:
                 })
               });
 
-              if (!initRes.ok) {
-                throw new Error(`DeepWiki init failed: ${initRes.status} ${await initRes.text()}`);
-              }
-
+              if (!initRes.ok) throw new Error(`DeepWiki init HTTP ${initRes.status}`);
               const initText = await initRes.text();
-              parseMCPResponse(initText);
+              parseMCPResponse(initText); // validate
 
               const sessionId = initRes.headers.get('mcp-session-id');
               const headers = { ...baseHeaders };
               if (sessionId) headers['mcp-session-id'] = sessionId;
 
-              // Call ask_question
-              const toolRes = await fetch(url, {
+              // ask_question
+              const toolRes = await fetchWithTimeout(url, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify({
-                  jsonrpc: '2.0',
-                  id: 2,
-                  method: 'tools/call',
-                  params: {
-                    name: 'ask_question',
-                    arguments: { repoName: repo, question }
-                  }
+                  jsonrpc: '2.0', id: 2, method: 'tools/call',
+                  params: { name: 'ask_question', arguments: { repoName, question } }
                 })
-              });
+              }, 45000); // DeepWiki can be slow — 45s for the actual query
 
               const toolText = await toolRes.text();
               console.log('Tool response preview:', toolText.slice(0, 600));
               const toolData = parseMCPResponse(toolText);
 
-              if (toolData.error) {
-                throw new Error(`DeepWiki error: ${JSON.stringify(toolData.error)}`);
-              }
+              if (toolData.error) throw new Error(`DeepWiki tool error: ${JSON.stringify(toolData.error)}`);
 
               const content = toolData.result?.content ?? [];
               return content.filter(c => c.type === 'text').map(c => c.text).join('\n');
             }
 
-            // ── 2. Polish with Groq ─────────────────────────────────────────
-            async function polishWithGroq(issueTitle, issueBody, deepwikiAnswer) {
-              const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                  'Content-Type':  'application/json',
-                  'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-                },
-                body: JSON.stringify({
-                  model: 'llama-3.3-70b-versatile',
-                  max_tokens: 1024,
-                  messages: [
-                    {
-                      role: 'system',
-                      content: `You are a helpful, friendly GitHub bot for the ${repoName} repository. Your job is to answer issues using documentation context retrieved from DeepWiki. Write in a warm, concise tone. Use markdown formatting. Always end with a note that you are an AI bot powered by DeepWiki + Groq, and invite the user to ask follow-up questions or add more details if needed. If the DeepWiki context does not cover the question well, say so honestly and suggest checking the official docs or pinging a maintainer. "and every response should be english"`
-                    },
-                    {
-                      role: 'user',
-                      content: `Issue Title: ${issueTitle}\n\nIssue Body:\n${issueBody || '(no body provided)'}\n\nDeepWiki context about this repo:\n${deepwikiAnswer || '(no context retrieved)'}\n\nPlease write a helpful GitHub issue comment answering this issue.`
-                    }
-                  ]
-                })
-              });
+            // ── Groq with retry ──────────────────────────────────────────────
+            async function callGroq(issueTitle, issueBody, deepwikiContext, retries = 2) {
+              const systemPrompt = deepwikiContext
+                ? `You are a helpful, friendly GitHub bot for the ${repoName} repository. Use this DeepWiki documentation context to answer:\n\n${deepwikiContext}`
+                : `You are a helpful GitHub bot for the ${repoName} repository. DeepWiki context was unavailable — answer from general knowledge and be honest about uncertainty.`;
 
-              const data = await res.json();
-              if (data.error) throw new Error(`Groq error: ${JSON.stringify(data.error)}`);
-              return data.choices?.[0]?.message?.content ?? '';
+              for (let attempt = 1; attempt <= retries; attempt++) {
+                try {
+                  const res = await fetchWithTimeout('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                      model: 'llama-3.3-70b-versatile',
+                      max_tokens: 1024,
+                      messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: `Issue Title: ${issueTitle}\n\nIssue Body:\n${issueBody || '(no body provided)'}\n\nWrite a helpful GitHub comment. Use markdown. End with a note that you are an AI bot powered by DeepWiki + Groq and invite follow-up questions. All responses must be in English.` }
+                      ]
+                    })
+                  }, 20000);
+
+                  const data = await res.json();
+
+                  // Rate limit — wait and retry
+                  if (res.status === 429) {
+                    const wait = attempt * 5000;
+                    console.warn(`Groq rate limited. Waiting ${wait}ms before retry ${attempt}/${retries}...`);
+                    await new Promise(r => setTimeout(r, wait));
+                    continue;
+                  }
+
+                  if (data.error) throw new Error(`Groq error: ${JSON.stringify(data.error)}`);
+                  return data.choices?.[0]?.message?.content ?? '';
+
+                } catch (err) {
+                  if (attempt === retries) throw err;
+                  console.warn(`Groq attempt ${attempt} failed: ${err.message}. Retrying...`);
+                  await new Promise(r => setTimeout(r, 3000));
+                }
+              }
             }
 
-            // ── 3. Post comment ─────────────────────────────────────────────
+            // ── Main ─────────────────────────────────────────────────────────
             try {
-              const thinkingComment = await github.rest.issues.createComment({
-                owner:        context.repo.owner,
-                repo:         context.repo.repo,
+              const placeholder = await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
                 issue_number: issueNumber,
-                body:         '🤖 _DeepWiki Bot is looking up the repository docs and preparing an answer…_'
+                body: '🤖 _DeepWiki Bot is looking up the repository docs and preparing an answer…_'
               });
 
               const question = `${issueTitle}\n\n${issueBody}`.trim();
 
               let deepwikiContext = '';
               try {
-                deepwikiContext = await askDeepWiki(repoName, question);
+                deepwikiContext = await askDeepWiki(question);
                 console.log('DeepWiki context length:', deepwikiContext.length);
                 console.log('DeepWiki context preview:', deepwikiContext.slice(0, 300));
               } catch (err) {
                 console.warn('DeepWiki fetch failed, continuing without context:', err.message);
               }
 
-              const answer = await polishWithGroq(issueTitle, issueBody, deepwikiContext);
+              const answer = await callGroq(issueTitle, issueBody, deepwikiContext);
+
+              const contextNote = deepwikiContext
+                ? '_✅ Powered by DeepWiki + Groq — answer based on actual repo documentation._'
+                : '_⚠️ DeepWiki context unavailable — answer based on general knowledge. A maintainer may want to follow up._';
 
               await github.rest.issues.updateComment({
                 owner:      context.repo.owner,
                 repo:       context.repo.repo,
-                comment_id: thinkingComment.data.id,
-                body:       answer
+                comment_id: placeholder.data.id,
+                body: `${answer}\n\n---\n${contextNote}`
               });
 
               console.log(`Successfully answered issue #${issueNumber}`);
+
             } catch (err) {
-              console.error('Bot error:', err);
+              console.error('Bot error:', err.message);
               await github.rest.issues.createComment({
                 owner:        context.repo.owner,
                 repo:         context.repo.repo,

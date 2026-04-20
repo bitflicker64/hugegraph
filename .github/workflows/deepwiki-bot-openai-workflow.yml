@@ -28,22 +28,6 @@ jobs:
 
             console.log(`Processing issue #${issueNumber}: ${issueTitle}`);
 
-            // Test connection - read wiki structure first
-            const structRes = await fetch(url, {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 2,
-                method: 'tools/call',
-                params: {
-                  name: 'read_wiki_structure',
-                  arguments: { repoOwner: 'apache', repoName: 'incubator-hugegraph' }
-                }
-              })
-            });
-            const structData = await structRes.json();
-            console.log('Wiki structure:', JSON.stringify(structData, null, 2));
             // ── 1. Ask DeepWiki MCP ─────────────────────────────────────────
             async function askDeepWiki(owner, repo, question) {
               const url = 'https://mcp.deepwiki.com/mcp';
@@ -96,7 +80,7 @@ jobs:
               return content.filter(c => c.type === 'text').map(c => c.text).join('\n');
             }
 
-            // ── 2. Polish with OpenAI ───────────────────────────────────────
+            // ── 2. Polish with Groq ─────────────────────────────────────────
             async function polishWithOpenAI(issueTitle, issueBody, deepwikiAnswer) {
               const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
@@ -110,7 +94,7 @@ jobs:
                   messages: [
                     {
                       role: 'system',
-                      content: `You are a helpful, friendly GitHub bot for the ${repoName} repository. Your job is to answer issues using documentation context retrieved from DeepWiki. Write in a warm, concise tone. Use markdown formatting. Always end with a note that you are an AI bot powered by DeepWiki + GPT, and invite the user to ask follow-up questions or add more details if needed. If the DeepWiki context does not cover the question well, say so honestly and suggest checking the official docs or pinging a maintainer.`
+                      content: `You are a helpful, friendly GitHub bot for the ${repoName} repository. Your job is to answer issues using documentation context retrieved from DeepWiki. Write in a warm, concise tone. Use markdown formatting. Always end with a note that you are an AI bot powered by DeepWiki + Groq, and invite the user to ask follow-up questions or add more details if needed. If the DeepWiki context does not cover the question well, say so honestly and suggest checking the official docs or pinging a maintainer.`
                     },
                     {
                       role: 'user',

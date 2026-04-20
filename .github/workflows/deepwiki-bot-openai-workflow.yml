@@ -34,7 +34,10 @@ jobs:
 
               const initRes = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json, text/event-stream'
+                },
                 body: JSON.stringify({
                   jsonrpc: '2.0',
                   id: 1,
@@ -52,7 +55,10 @@ jobs:
               }
 
               const sessionId = initRes.headers.get('mcp-session-id');
-              const headers = { 'Content-Type': 'application/json' };
+              const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json, text/event-stream'
+              };
               if (sessionId) headers['mcp-session-id'] = sessionId;
 
               const toolRes = await fetch(url, {

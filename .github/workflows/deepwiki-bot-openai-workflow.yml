@@ -16,7 +16,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           REPO_OWNER: apache
-          REPO_NAME: hugegraph
+          REPO_NAME: incubator-hugegraph
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

@@ -27,7 +27,7 @@ jobs:
 
             const REPO_OWNER  = context.repo.owner;
             const REPO_NAME   = context.repo.repo;
-            const FULL_REPO   = `${REPO_OWNER}/${REPO_NAME}`;   // ✅ fixed — was bare unquoted text
+            const FULL_REPO   = apache/hugeraph   // ✅ fixed — was bare unquoted text
 
             const commenter   = context.payload.comment.user.login;
             const body        = context.payload.comment.body.trim();

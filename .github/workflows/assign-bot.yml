@@ -1,0 +1,362 @@
+name: Assign Check Bot
+
+on:
+  issue_comment:
+    types: [created]
+  schedule:
+    - cron: '0 9 * * *'   # daily at 09:00 UTC — deadline checker
+
+jobs:
+  # ── /assign-check and /approve-assign ────────────────────────────────────
+  handle-command:
+    if: github.event_name == 'issue_comment'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Run assign bot
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // ── Config ──────────────────────────────────────────────────────
+            const MAINTAINERS = ['maintainer1', 'maintainer2', 'maintainer3'];
+            // ☝️ Replace with your actual maintainer GitHub usernames
+
+            const REPO_OWNER  = context.repo.owner;
+            const REPO_NAME   = context.repo.repo;
+            const FULL_REPO   = `${REPO_OWNER}/${REPO_NAME}`;
+
+            const commenter   = context.payload.comment.user.login;
+            const body        = context.payload.comment.body.trim();
+            const issueNumber = context.payload.issue.number;
+
+            // ── Route commands ──────────────────────────────────────────────
+            const assignCheckMatch  = body.match(/^\/assign-check\s+@?([\w-]+)\s+(\d+)d?\b/i);
+            const approveAssignMatch = body.match(/^\/approve-assign\s+@?([\w-]+)/i);
+
+            if (!assignCheckMatch && !approveAssignMatch) return;
+
+            // ── Helpers ─────────────────────────────────────────────────────
+            async function postComment(msg) {
+              await github.rest.issues.createComment({
+                owner: REPO_OWNER, repo: REPO_NAME,
+                issue_number: issueNumber, body: msg
+              });
+            }
+
+            async function isMaintainer(login) {
+              return MAINTAINERS.includes(login);
+            }
+
+            // Fetch total contributions to this repo (commits authored)
+            async function getRepoContributions(login) {
+              try {
+                const { data } = await github.rest.repos.getContributorsStats({
+                  owner: REPO_OWNER, repo: REPO_NAME
+                });
+                if (!Array.isArray(data)) return 0;
+                const entry = data.find(c => c.author?.login === login);
+                return entry ? entry.total : 0;
+              } catch { return 0; }
+            }
+
+            // Fetch public profile data
+            async function getUserProfile(login) {
+              try {
+                const { data } = await github.rest.users.getByUsername({ username: login });
+                return data;
+              } catch { return null; }
+            }
+
+            // Fetch merged PRs in this repo
+            async function getMergedPRs(login) {
+              try {
+                const { data } = await github.rest.search.issuesAndPullRequests({
+                  q: `repo:${FULL_REPO} is:pr is:merged author:${login}`
+                });
+                return data.total_count;
+              } catch { return 0; }
+            }
+
+            // Fetch issues closed/opened in this repo
+            async function getIssueActivity(login) {
+              try {
+                const { data } = await github.rest.search.issuesAndPullRequests({
+                  q: `repo:${FULL_REPO} is:issue author:${login}`
+                });
+                return data.total_count;
+              } catch { return 0; }
+            }
+
+            // Check if user has forked this repo
+            async function hasFork(login) {
+              try {
+                // Check if the user has a fork by listing their forks of this repo
+                const { data } = await github.rest.repos.listForks({
+                  owner: REPO_OWNER, repo: REPO_NAME,
+                  per_page: 100
+                });
+                return data.some(fork => fork.owner.login === login);
+              } catch { return false; }
+            }
+
+            function timeAgo(dateStr) {
+              const diff = Date.now() - new Date(dateStr).getTime();
+              const days  = Math.floor(diff / 86400000);
+              if (days < 30)  return `${days}d ago`;
+              if (days < 365) return `${Math.floor(days/30)}mo ago`;
+              return `${Math.floor(days/365)}yr ago`;
+            }
+
+            // ── /assign-check @user Nd ───────────────────────────────────────
+            if (assignCheckMatch) {
+              const targetUser = assignCheckMatch[1];
+              const days       = parseInt(assignCheckMatch[2], 10);
+
+              if (days < 1 || days > 90) {
+                return postComment(`⚠️ @${commenter} — deadline must be between 1 and 90 days.`);
+              }
+
+              // Step 1: fork check
+              const forked = await hasFork(targetUser);
+              if (!forked) {
+                return postComment(
+                  `🤖 **@${targetUser} hasn't forked this repo.**\n\n` +
+                  `Not gonna let you work on it buddy — fork the repo first, ` +
+                  `then someone can run \`/assign-check\` for you again.\n\n` +
+                  `> _Fork it here: https://github.com/${FULL_REPO}_`
+                );
+              }
+
+              // Step 2: gather bio data in parallel
+              const [profile, repoContribs, mergedPRs, issueCount] = await Promise.all([
+                getUserProfile(targetUser),
+                getRepoContributions(targetUser),
+                getMergedPRs(targetUser),
+                getIssueActivity(targetUser)
+              ]);
+
+              if (!profile) {
+                return postComment(`⚠️ Could not fetch profile for @${targetUser}.`);
+              }
+
+              const accountAge  = timeAgo(profile.created_at);
+              const followers   = profile.followers ?? 0;
+              const publicRepos = profile.public_repos ?? 0;
+              const globalContribs = profile.public_repos ?? '—'; // GitHub API doesn't expose total contributions publicly; we note this
+              const bio         = profile.bio ? `\n> ${profile.bio}\n` : '';
+              const location    = profile.location ? `📍 ${profile.location}` : '';
+              const company     = profile.company  ? `🏢 ${profile.company}`  : '';
+
+              const card = [
+                `## 🤖 Contributor Bio — @${targetUser}`,
+                bio,
+                `| Field | Value |`,
+                `|---|---|`,
+                `| 🍴 Forked repo | ✅ Yes |`,
+                `| 📅 Account created | ${accountAge} |`,
+                `| 👥 Followers | ${followers} |`,
+                `| 📦 Public repos | ${publicRepos} |`,
+                location ? `| ${location} | |` : null,
+                company  ? `| ${company} | |`  : null,
+                `| 🔨 Commits in this repo | ${repoContribs} |`,
+                `| ✅ PRs merged in this repo | ${mergedPRs} |`,
+                `| 📝 Issues opened in this repo | ${issueCount} |`,
+                ``,
+                `---`,
+                `**Requested deadline:** ${days} day${days > 1 ? 's' : ''}`,
+                ``,
+                `A maintainer can approve with:`,
+                `\`\`\``,
+                `/approve-assign @${targetUser}`,
+                `\`\`\``,
+                ``,
+                `_🤖 Assign Bot — bio pulled from GitHub API_`
+              ].filter(l => l !== null).join('\n');
+
+              return postComment(card);
+            }
+
+            // ── /approve-assign @user ────────────────────────────────────────
+            if (approveAssignMatch) {
+              if (!(await isMaintainer(commenter))) {
+                return postComment(
+                  `🚫 @${commenter} — only maintainers can approve assignments.`
+                );
+              }
+
+              const targetUser = approveAssignMatch[1];
+
+              // Look back through comments to find the most recent /assign-check for this user
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: REPO_OWNER, repo: REPO_NAME,
+                issue_number: issueNumber, per_page: 100
+              });
+
+              let days = 7; // default if not found
+              for (let i = comments.length - 1; i >= 0; i--) {
+                const m = comments[i].body.match(new RegExp(`\\/assign-check\\s+@?${targetUser}\\s+(\\d+)d?\\b`, 'i'));
+                if (m) { days = parseInt(m[1], 10); break; }
+              }
+
+              const deadline    = new Date(Date.now() + days * 86400000);
+              const deadlineStr = deadline.toISOString().split('T')[0]; // YYYY-MM-DD
+
+              // Assign the issue
+              await github.rest.issues.addAssignees({
+                owner: REPO_OWNER, repo: REPO_NAME,
+                issue_number: issueNumber,
+                assignees: [targetUser]
+              });
+
+              // Add label (create it if missing)
+              const labelName = `assigned:${days}d`;
+              try {
+                await github.rest.issues.getLabel({ owner: REPO_OWNER, repo: REPO_NAME, name: labelName });
+              } catch {
+                await github.rest.issues.createLabel({
+                  owner: REPO_OWNER, repo: REPO_NAME,
+                  name: labelName, color: '0075ca',
+                  description: `Assigned with a ${days}-day deadline`
+                });
+              }
+              await github.rest.issues.addLabels({
+                owner: REPO_OWNER, repo: REPO_NAME,
+                issue_number: issueNumber, labels: [labelName]
+              });
+
+              // Store deadline as a pinned comment so the cron can find it
+              await postComment(
+                `<!-- ASSIGN_BOT: assignee=${targetUser} deadline=${deadlineStr} days=${days} -->\n` +
+                `✅ **@${targetUser} has been assigned** by @${commenter}.\n\n` +
+                `⏰ **Deadline: ${deadlineStr}** (${days} day${days > 1 ? 's' : ''} from now)\n\n` +
+                `Please post an update at least once before the deadline. ` +
+                `The bot will warn you 3 days before and unassign if there's no activity by ${deadlineStr}.\n\n` +
+                `_🤖 Assign Bot_`
+              );
+            }
+
+# ── Daily deadline checker ─────────────────────────────────────────────────
+  check-deadlines:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Check assignment deadlines
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const REPO_OWNER = context.repo.owner;
+            const REPO_NAME  = context.repo.repo;
+            const today      = new Date();
+
+            // Get all open issues that have an assigned:Xd label
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: REPO_OWNER, repo: REPO_NAME,
+              state: 'open', per_page: 100
+            });
+
+            const assignedIssues = issues.filter(issue =>
+              issue.labels.some(l => l.name.startsWith('assigned:'))
+            );
+
+            console.log(`Found ${assignedIssues.length} assigned issue(s) to check.`);
+
+            for (const issue of assignedIssues) {
+              // Find the bot's assign comment to get deadline
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: REPO_OWNER, repo: REPO_NAME,
+                issue_number: issue.number, per_page: 100
+              });
+
+              let assignee = null;
+              let deadline = null;
+              let days     = null;
+
+              for (const c of comments) {
+                const m = c.body.match(/<!-- ASSIGN_BOT: assignee=([\w-]+) deadline=(\d{4}-\d{2}-\d{2}) days=(\d+) -->/);
+                if (m) {
+                  assignee = m[1];
+                  deadline = new Date(m[2]);
+                  days     = parseInt(m[3], 10);
+                }
+              }
+
+              if (!assignee || !deadline) continue;
+
+              const daysLeft = Math.ceil((deadline - today) / 86400000);
+              console.log(`Issue #${issue.number}: @${assignee}, ${daysLeft} day(s) left`);
+
+              // Check if assignee has posted anything since assignment
+              const assignBotComment = comments.find(c =>
+                c.body.includes('<!-- ASSIGN_BOT:') && c.body.includes(assignee)
+              );
+              const assignedAt = assignBotComment ? new Date(assignBotComment.created_at) : null;
+
+              const hasUpdate = assignedAt && comments.some(c =>
+                c.user.login === assignee &&
+                new Date(c.created_at) > assignedAt
+              );
+
+              // ── 3-day warning ────────────────────────────────────────────
+              if (daysLeft === 3 && !hasUpdate) {
+                // Check if we already warned (avoid duplicate warnings)
+                const alreadyWarned = comments.some(c =>
+                  c.body.includes('⚠️ **Deadline reminder') && c.body.includes(assignee)
+                );
+                if (!alreadyWarned) {
+                  await github.rest.issues.createComment({
+                    owner: REPO_OWNER, repo: REPO_NAME,
+                    issue_number: issue.number,
+                    body:
+                      `⚠️ **Deadline reminder — @${assignee}**\n\n` +
+                      `You have **3 days left** (deadline: ${deadline.toISOString().split('T')[0]}) ` +
+                      `to post an update on this issue.\n\n` +
+                      `If you need more time or can't continue, please let the maintainers know ` +
+                      `so someone else can pick this up.\n\n` +
+                      `_🤖 Assign Bot_`
+                  });
+                  console.log(`Warned @${assignee} on issue #${issue.number}`);
+                }
+              }
+
+              // ── Deadline passed, no update → unassign ────────────────────
+              if (daysLeft <= 0 && !hasUpdate) {
+                // Remove assignee
+                await github.rest.issues.removeAssignees({
+                  owner: REPO_OWNER, repo: REPO_NAME,
+                  issue_number: issue.number,
+                  assignees: [assignee]
+                });
+
+                // Remove assigned:Xd label
+                const labelName = `assigned:${days}d`;
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner: REPO_OWNER, repo: REPO_NAME,
+                    issue_number: issue.number, name: labelName
+                  });
+                } catch { /* label may already be gone */ }
+
+                await github.rest.issues.createComment({
+                  owner: REPO_OWNER, repo: REPO_NAME,
+                  issue_number: issue.number,
+                  body:
+                    `⏰ **Time's up — @${assignee} has been unassigned.**\n\n` +
+                    `The ${days}-day deadline passed with no update on this issue. ` +
+                    `This issue is now open for someone else to pick up.\n\n` +
+                    `@${assignee} — if you'd still like to work on this, ` +
+                    `ask a maintainer to re-assign you.\n\n` +
+                    `_🤖 Assign Bot_`
+                });
+
+                console.log(`Unassigned @${assignee} from issue #${issue.number} — deadline passed`);
+              }
+            }

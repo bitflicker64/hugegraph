@@ -98,16 +98,39 @@ jobs:
               } catch { return 0; }
             }
 
-            // Check if user has forked the upstream repo
-            // Instead of paginating all forks, fetch the user's own copy of the repo directly —
-            // if it exists and its parent is the upstream, they've forked it.
+            // Check if user has forked the upstream repo.
+            // We can't assume the fork has the same repo name (e.g. apache/hugegraph
+            // forks as Pranjal2007v/hugegraph, not /incubator-hugegraph).
+            // So we list the user's public repos and check if any is a fork of UPSTREAM.
             async function hasFork(login) {
               try {
-                const { data } = await github.rest.repos.get({
-                  owner: login,
-                  repo: REPO_NAME
+                // First try the most likely name (upstream repo name)
+                const upstreamRepoName = UPSTREAM.split('/')[1];
+                try {
+                  const { data } = await github.rest.repos.get({
+                    owner: login,
+                    repo: upstreamRepoName
+                  });
+                  if (data.fork === true && data.parent?.full_name === UPSTREAM) return true;
+                } catch { /* repo name didn't match, fall through */ }
+
+                // Fallback: scan user's repos for any fork of UPSTREAM (up to 100)
+                const { data: repos } = await github.rest.repos.listForUser({
+                  username: login,
+                  type: 'forks',
+                  per_page: 100
                 });
-                return data.fork === true && data.parent?.full_name === UPSTREAM;
+                for (const repo of repos) {
+                  if (repo.fork) {
+                    try {
+                      const { data: full } = await github.rest.repos.get({
+                        owner: login, repo: repo.name
+                      });
+                      if (full.parent?.full_name === UPSTREAM) return true;
+                    } catch { continue; }
+                  }
+                }
+                return false;
               } catch { return false; }
             }
 

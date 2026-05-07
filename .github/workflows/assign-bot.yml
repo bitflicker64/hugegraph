@@ -22,12 +22,12 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             // ── Config ──────────────────────────────────────────────────────
-            const MAINTAINERS = ['maintainer1', 'maintainer2', 'maintainer3'];
+            const MAINTAINERS = ['bitflicker64', 'maintainer2', 'maintainer3'];
             // ☝️ Replace with your actual maintainer GitHub usernames
 
             const REPO_OWNER  = context.repo.owner;
             const REPO_NAME   = context.repo.repo;
-            const FULL_REPO   = `${REPO_OWNER}/${REPO_NAME}`;
+            const FULL_REPO   = apache/incubator-hugegraph;
 
             const commenter   = context.payload.comment.user.login;
             const body        = context.payload.comment.body.trim();

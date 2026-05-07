@@ -27,15 +27,21 @@ jobs:
 
             const REPO_OWNER  = context.repo.owner;
             const REPO_NAME   = context.repo.repo;
-            const FULL_REPO   = apache/incubator-hugegraph;
+            const FULL_REPO   = `${REPO_OWNER}/${REPO_NAME}`;   // ✅ fixed — was bare unquoted text
 
             const commenter   = context.payload.comment.user.login;
             const body        = context.payload.comment.body.trim();
             const issueNumber = context.payload.issue.number;
 
             // ── Route commands ──────────────────────────────────────────────
-            const assignCheckMatch  = body.match(/^\/assign-check\s+@?([\w-]+)\s+(\d+)d?\b/i);
-            const approveAssignMatch = body.match(/^\/approve-assign\s+@?([\w-]+)/i);
+            // Strip markdown formatting GitHub editors inject around mentions:
+            // __[@user](url)__ or **[@user](url)** or plain @user — normalise to plain text first
+            const plainBody = body
+              .replace(/[_*]{1,2}\[@?([\w-]+)\]\([^)]*\)[_*]{1,2}/g, '@$1')  // __[@user](url)__
+              .replace(/\[@?([\w-]+)\]\([^)]*\)/g, '@$1');                     // [@user](url)
+
+            const assignCheckMatch   = plainBody.match(/^\/assign-check\s+@?([\w-]+)\s+(\d+)d?\b/i);
+            const approveAssignMatch = plainBody.match(/^\/approve-assign\s+@?([\w-]+)/i);
 
             if (!assignCheckMatch && !approveAssignMatch) return;
 
@@ -94,7 +100,6 @@ jobs:
             // Check if user has forked this repo
             async function hasFork(login) {
               try {
-                // Check if the user has a fork by listing their forks of this repo
                 const { data } = await github.rest.repos.listForks({
                   owner: REPO_OWNER, repo: REPO_NAME,
                   per_page: 100
@@ -146,7 +151,6 @@ jobs:
               const accountAge  = timeAgo(profile.created_at);
               const followers   = profile.followers ?? 0;
               const publicRepos = profile.public_repos ?? 0;
-              const globalContribs = profile.public_repos ?? '—'; // GitHub API doesn't expose total contributions publicly; we note this
               const bio         = profile.bio ? `\n> ${profile.bio}\n` : '';
               const location    = profile.location ? `📍 ${profile.location}` : '';
               const company     = profile.company  ? `🏢 ${profile.company}`  : '';
@@ -239,7 +243,7 @@ jobs:
               );
             }
 
-# ── Daily deadline checker ─────────────────────────────────────────────────
+  # ── Daily deadline checker ─────────────────────────────────────────────────
   check-deadlines:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
@@ -270,7 +274,6 @@ jobs:
             console.log(`Found ${assignedIssues.length} assigned issue(s) to check.`);
 
             for (const issue of assignedIssues) {
-              // Find the bot's assign comment to get deadline
               const { data: comments } = await github.rest.issues.listComments({
                 owner: REPO_OWNER, repo: REPO_NAME,
                 issue_number: issue.number, per_page: 100
@@ -294,7 +297,6 @@ jobs:
               const daysLeft = Math.ceil((deadline - today) / 86400000);
               console.log(`Issue #${issue.number}: @${assignee}, ${daysLeft} day(s) left`);
 
-              // Check if assignee has posted anything since assignment
               const assignBotComment = comments.find(c =>
                 c.body.includes('<!-- ASSIGN_BOT:') && c.body.includes(assignee)
               );
@@ -307,7 +309,6 @@ jobs:
 
               // ── 3-day warning ────────────────────────────────────────────
               if (daysLeft === 3 && !hasUpdate) {
-                // Check if we already warned (avoid duplicate warnings)
                 const alreadyWarned = comments.some(c =>
                   c.body.includes('⚠️ **Deadline reminder') && c.body.includes(assignee)
                 );
@@ -329,14 +330,12 @@ jobs:
 
               // ── Deadline passed, no update → unassign ────────────────────
               if (daysLeft <= 0 && !hasUpdate) {
-                // Remove assignee
                 await github.rest.issues.removeAssignees({
                   owner: REPO_OWNER, repo: REPO_NAME,
                   issue_number: issue.number,
                   assignees: [assignee]
                 });
 
-                // Remove assigned:Xd label
                 const labelName = `assigned:${days}d`;
                 try {
                   await github.rest.issues.removeLabel({

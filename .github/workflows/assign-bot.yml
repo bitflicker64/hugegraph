@@ -27,7 +27,8 @@ jobs:
 
             const REPO_OWNER  = context.repo.owner;
             const REPO_NAME   = context.repo.repo;
-            const FULL_REPO   = apache/hugeraph   // ✅ fixed — was bare unquoted text
+            const UPSTREAM    = 'apache/hugegraph';  // upstream for stats lookups
+            const FULL_REPO   = UPSTREAM;
 
             const commenter   = context.payload.comment.user.login;
             const body        = context.payload.comment.body.trim();
@@ -97,14 +98,16 @@ jobs:
               } catch { return 0; }
             }
 
-            // Check if user has forked this repo
+            // Check if user has forked the upstream repo
+            // Instead of paginating all forks, fetch the user's own copy of the repo directly —
+            // if it exists and its parent is the upstream, they've forked it.
             async function hasFork(login) {
               try {
-                const { data } = await github.rest.repos.listForks({
-                  owner: REPO_OWNER, repo: REPO_NAME,
-                  per_page: 100
+                const { data } = await github.rest.repos.get({
+                  owner: login,
+                  repo: REPO_NAME
                 });
-                return data.some(fork => fork.owner.login === login);
+                return data.fork === true && data.parent?.full_name === UPSTREAM;
               } catch { return false; }
             }
 

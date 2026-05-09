@@ -17,7 +17,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          REPO_NAME: apache/incubator-hugegraph
+          REPO_NAME: PROJECT-bitflicker/hg_flat
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

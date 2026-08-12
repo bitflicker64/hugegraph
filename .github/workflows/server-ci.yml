@@ -144,7 +144,12 @@ jobs:
             local cluster="docker/docker-compose-3pd-3store-3server.yml"
             local addon="docker/docker-compose-hubble.yml"
             local rendered
+            local token_fixture=ci-test-token-secret-32-bytes-long
             rendered="$(mktemp)"
+            if [ "${#token_fixture}" -lt 32 ]; then
+              echo "CI token fixture must be at least 32 bytes" >&2
+              return 1
+            fi
 
             # RETURN only: an EXIT trap would fire after this function's
             # `local rendered` has gone out of scope, which `set -u` turns
@@ -183,10 +188,10 @@ jobs:
             }
 
             ( unset HUGEGRAPH_ADMIN_PASSWORD
-              export HUGEGRAPH_AUTH_TOKEN_SECRET=ci-test-token-secret-32-bytes-long
+              export HUGEGRAPH_AUTH_TOKEN_SECRET="${token_fixture}"
               assert_guard HUGEGRAPH_ADMIN_PASSWORD "an unset admin password" )
             ( export HUGEGRAPH_ADMIN_PASSWORD=
-              export HUGEGRAPH_AUTH_TOKEN_SECRET=ci-test-token-secret-32-bytes-long
+              export HUGEGRAPH_AUTH_TOKEN_SECRET="${token_fixture}"
               assert_guard HUGEGRAPH_ADMIN_PASSWORD "an empty admin password" )
             ( unset HUGEGRAPH_AUTH_TOKEN_SECRET
               export HUGEGRAPH_ADMIN_PASSWORD=ci-test-password
@@ -194,7 +199,6 @@ jobs:
             ( export HUGEGRAPH_ADMIN_PASSWORD=ci-test-password
               export HUGEGRAPH_AUTH_TOKEN_SECRET=
               assert_guard HUGEGRAPH_AUTH_TOKEN_SECRET "an empty token secret" )
-
             # The add-on alone must define Hubble and nothing else, join the
             # shared external network with its default name, and need no
             # credentials or overrides.
@@ -224,7 +228,7 @@ jobs:
             # The combined render below pins an override, so it cannot catch a
             # drifting default.
             HUGEGRAPH_ADMIN_PASSWORD=ci-test-password \
-            HUGEGRAPH_AUTH_TOKEN_SECRET=ci-test-token-secret-32-bytes-long \
+            HUGEGRAPH_AUTH_TOKEN_SECRET="${token_fixture}" \
               env -u HUGEGRAPH_NETWORK -u HUBBLE_IMAGE -u HUBBLE_PULL_POLICY \
                   -u HUBBLE_PUBLISH_HOST \
               docker compose --env-file /dev/null -f "$cluster" \
@@ -238,7 +242,7 @@ jobs:
             # CI fails if any file stops honoring the overrides (the add-on
             # render above covers the defaults).
             HUGEGRAPH_ADMIN_PASSWORD=ci-test-password \
-            HUGEGRAPH_AUTH_TOKEN_SECRET=ci-test-token-secret-32-bytes-long \
+            HUGEGRAPH_AUTH_TOKEN_SECRET="${token_fixture}" \
             HUGEGRAPH_NETWORK=ci-test-net \
             HUGEGRAPH_VERSION=ci-test-tag \
               env -u HUBBLE_IMAGE -u HUBBLE_PULL_POLICY -u HUBBLE_PUBLISH_HOST \

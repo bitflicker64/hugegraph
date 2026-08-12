@@ -211,6 +211,17 @@ on every Compose subcommand, including `down`.
     printf "HUGEGRAPH_AUTH_TOKEN_SECRET='%s'\n" "${token_secret}" >> .env
     unset token_secret
   fi
+  admin_value="$(sed -nE "s/${pat}HUGEGRAPH_ADMIN_PASSWORD='([^']*)'[[:space:]]*$/\\1/p" .env | tail -n1)"
+  token_value="$(sed -nE "s/${pat}HUGEGRAPH_AUTH_TOKEN_SECRET='([^']*)'[[:space:]]*$/\\1/p" .env | tail -n1)"
+  [ -n "${admin_value}" ] || {
+    echo "HUGEGRAPH_ADMIN_PASSWORD must be non-empty in docker/.env" >&2
+    exit 1
+  }
+  [ "${#token_value}" -ge 32 ] || {
+    echo "HUGEGRAPH_AUTH_TOKEN_SECRET must be at least 32 bytes in docker/.env" >&2
+    exit 1
+  }
+  unset admin_value token_value
   # The shared cluster network. To override the name, export
   # HUGEGRAPH_NETWORK in this shell before running the block — a value
   # in docker/.env is read by Compose, not by this script.
@@ -341,7 +352,10 @@ cluster with different hostnames. Its `pd.server` is a single PD address
 with no failover, so if that PD is down the operations view goes blind even
 though the cluster still has quorum — repoint it at a surviving PD. The
 operations view also reports one `SERVER` node, not three: it describes the
-replica Hubble is currently talking to, not the whole Server tier.
+replica Hubble is currently talking to, not the whole Server tier. The add-on
+stores Hubble's H2 database and uploaded files in named volumes
+`hg-hubble-db` and `hg-hubble-upload-files`, so recreating the container does
+not discard that state.
 
 Sign in at `http://localhost:8088` as `admin` with the
 `HUGEGRAPH_ADMIN_PASSWORD` from `docker/.env`. Hubble binds to host

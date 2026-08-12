@@ -175,10 +175,17 @@ To validate local images without Compose replacing them with remote `latest`:
 
 The cluster and the Hubble add-on share one named Docker network so Hubble
 can attach to a running cluster without touching it. Treat that network as a
-trust boundary: PD and Store expose unauthenticated control APIs on it (only
-the Server layer authenticates), and any container on the host can join it
-by declaring the well-known name. One-time setup: write the required
-credentials to a mode-600 `docker/.env` and create the network.
+trust boundary: only the Server layer performs real authentication. Store
+serves its control APIs with no credentials at all, and while PD's REST
+control APIs do require an `Authorization` header, PD only checks that the
+Basic-auth *user* is one of its internal service names and never validates
+the password — so any client on the network can read and drive them. Note
+that this stack depends on that behaviour: Hubble reaches PD as the service
+name `hubble` with an empty password, so tightening PD's credential check
+would also break Hubble's operations view. Any container on the host can
+also join the network by declaring the well-known name. One-time setup:
+write the required credentials to a mode-600 `docker/.env` and create the
+network.
 The cluster file requires both credentials — the admin password enables
 authentication, and every Server replica must share one token secret so a
 token issued by any server validates on all of them. The `:?` guards fire
@@ -234,9 +241,13 @@ it from there, so those versions cannot drift apart
 (`docker-compose.dev.yml` builds PD/Store/Server from source and defaults
 Hubble to `hugegraph/hubble:latest`; set `HUBBLE_IMAGE` to pin it).
 Unpinned, the images default to `latest`; note the authenticated PD/Hubble
-integration requires a release newer than `1.7.x`. Because the cluster
-files use `pull_policy: missing`, an already-pulled `latest` is never
-refreshed by `up -d` — pull explicitly or pin to pick up new releases.
+integration requires a release newer than `1.7.x`. On an older image the
+Server silently ignores `PASSWORD` and `HG_SERVER_AUTH_TOKEN_SECRET`, comes
+up healthy, and leaves you an unauthenticated cluster — the 401 check under
+"Verify the cluster is healthy" below is what detects this, so run it.
+Because the cluster files use `pull_policy: missing`, an already-pulled
+`latest` is never refreshed by `up -d` — pull explicitly or pin to pick up
+new releases.
 
 > [!NOTE]
 > Upgrading an existing 3-node deployment:
@@ -274,12 +285,47 @@ curl http://localhost:8520/v1/health
 # Check Server (Graph API)
 curl http://localhost:8080/versions
 
-# List registered stores via PD
-curl http://localhost:8620/v1/stores
+# Every PD endpoint except /v1/health, /actuator/* and /v1/prom/targets/*
+# needs an Authorization header. PD only checks that the Basic-auth user is
+# one of its internal service names, so the empty password below is enough
+# — and it grants the full PD control plane, writes included, not just these
+# reads. That is exactly why the shared network must be treated as a trust
+# boundary. Without the header PD answers with an exception body, not data.
+pd_auth="Authorization: Basic $(printf 'hubble:' | base64)"
+
+# List registered stores via PD (expect three, each "state":"Up")
+curl -H "${pd_auth}" http://localhost:8620/v1/stores
 
 # List partitions
-curl http://localhost:8620/v1/partitions
+curl -H "${pd_auth}" http://localhost:8620/v1/partitions
 ```
+
+Confirm authentication actually engaged — `/versions` stays open by design,
+so it cannot tell you whether auth is on. A graph read without credentials
+must be rejected:
+
+```bash
+cd docker
+# Expect 401 on all three replicas
+for port in 8080 8081 8082; do
+  curl -s -o /dev/null -w "${port}: %{http_code}\n" \
+    "http://localhost:${port}/graphs/hugegraph/schema/vertexlabels"
+done
+
+# And a signed-in read must succeed. Compose reads docker/.env by itself, but
+# your shell does not — load it first. Passing the credential through
+# --config keeps it out of argv, where `ps` would expose it to other users.
+set -a; . ./.env; set +a
+curl -s -o /dev/null -w '%{http_code}\n' \
+  --config <(printf 'user = "admin:%s"\n' "${HUGEGRAPH_ADMIN_PASSWORD}") \
+  http://localhost:8080/graphs/hugegraph/schema/vertexlabels
+```
+
+`200` from the second command with `401` from all three of the first means
+authentication is on and working. If the first command returns `200`, the
+running image ignored `PASSWORD` and the cluster is **unauthenticated** —
+the most likely cause is an image older than the release this integration
+needs (see the version note in the quickstart above).
 
 ---
 
@@ -291,12 +337,22 @@ cluster's external network (`hugegraph-net` by default, override with
 starting, stopping, or upgrading Hubble never recreates or restarts PD,
 Store, or Server containers. Hubble reads the cluster topology from
 `hugegraph-hubble-3x3.properties`; adjust that file when attaching to a
-cluster with different hostnames.
+cluster with different hostnames. Its `pd.server` is a single PD address
+with no failover, so if that PD is down the operations view goes blind even
+though the cluster still has quorum — repoint it at a surviving PD. The
+operations view also reports one `SERVER` node, not three: it describes the
+replica Hubble is currently talking to, not the whole Server tier.
 
 Sign in at `http://localhost:8088` as `admin` with the
 `HUGEGRAPH_ADMIN_PASSWORD` from `docker/.env`. Hubble binds to host
 loopback by default (`HUBBLE_PUBLISH_HOST`, same caveats as the
 single-node setup).
+
+Which flow to use: pick the attach flow when you do not have the cluster's
+`docker/.env` — the add-on carries no `:?` guards, so it is the only flow
+that runs without those credentials, which is what you want against a
+cluster someone else started. Otherwise use the combined flow, including to
+add Hubble to an already-running cluster (`up -d --no-deps hubble`).
 
 The two flows below create Hubble in different Compose projects, so manage
 Hubble with the same flags you started it with: the attach flow always uses
@@ -304,11 +360,32 @@ Hubble with the same flags you started it with: the attach flow always uses
 uses both `-f` flags. The explicit `-p` keeps the attach project independent
 of the directory name and of other Compose projects.
 
+> [!IMPORTANT]
+> Do not drop the `-p` from the attach flow. Without it Compose names the
+> project after the current directory (`docker`), so Hubble starts in a
+> third project that none of the commands below manage: `down` reports
+> nothing to remove while `hg-hubble` keeps running, and every later `up`
+> in either flow fails on the container name. If that happens, find it with
+> `docker ps --filter name=hg-hubble` and remove it with
+> `docker rm -f hg-hubble`.
+
 Run one Hubble per host: the single-node stack and both add-on flows all
 publish `127.0.0.1:8088` and name their container `hg-hubble`. The two
 add-on flows are therefore mutually exclusive — starting one while the
-other's Hubble exists fails with a container-name conflict, so `down` the
-flow you are leaving before switching.
+other's Hubble exists fails with a container-name conflict, so remove the
+Hubble of the flow you are leaving before switching. The two directions are
+not symmetric:
+
+```bash
+cd docker
+# leaving the attach flow (removes only Hubble)
+docker compose -p hugegraph-hubble -f docker-compose-hubble.yml down
+
+# leaving the combined flow — remove ONLY Hubble; a plain `down` with both
+# -f flags would stop all ten containers just to move one.
+docker compose -f docker-compose-3pd-3store-3server.yml \
+               -f docker-compose-hubble.yml rm -sf hubble
+```
 
 ### Attach to a running cluster
 
@@ -555,9 +632,11 @@ The table below reflects the published host ports of the 3-node cluster
 
 > [!IMPORTANT]
 > Cluster ports bind all host interfaces and bypass host firewalls under
-> Docker's port publishing; the PD and Store APIs among them are
-> unauthenticated. Do not run this file on an untrusted network. Hubble is
-> the exception and binds loopback only by default.
+> Docker's port publishing. Among them, the Store APIs need no credentials
+> at all and the PD APIs accept any password for their internal service
+> names, so neither is a real access control — see the trust-boundary note
+> in the 3-Node Cluster Quickstart. Do not run this file on an untrusted
+> network. Hubble is the exception and binds loopback only by default.
 
 The single-node Compose file publishes `8620`, `8520`, `8080`, and Hubble
 `8088`; Hubble defaults to host loopback.

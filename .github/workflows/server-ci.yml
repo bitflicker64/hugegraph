@@ -95,18 +95,20 @@ jobs:
             rendered="$(mktemp)"
 
             if env -u HUGEGRAPH_ADMIN_PASSWORD \
-                 docker compose -f "$file" config -q >/dev/null 2>&1; then
+                 docker compose --env-file /dev/null -f "$file" config -q >/dev/null 2>&1; then
               echo "$file accepted an unset admin password" >&2
               return 1
             fi
             if HUGEGRAPH_ADMIN_PASSWORD= \
-                 docker compose -f "$file" config -q >/dev/null 2>&1; then
+                 docker compose --env-file /dev/null -f "$file" config -q >/dev/null 2>&1; then
               echo "$file accepted an empty admin password" >&2
               return 1
             fi
 
             HUGEGRAPH_ADMIN_PASSWORD=ci-test-password \
-              docker compose -f "$file" config --format json > "$rendered"
+              env -u HUBBLE_IMAGE -u HUBBLE_PULL_POLICY -u HUBBLE_PUBLISH_HOST \
+                  -u HUGEGRAPH_SERVER_IMAGE -u HUGEGRAPH_SERVER_PULL_POLICY \
+              docker compose --env-file /dev/null -f "$file" config --format json > "$rendered"
             jq -e \
               --arg server_policy "$server_policy" \
               --arg hubble_policy "$hubble_policy" '
@@ -144,47 +146,91 @@ jobs:
             local rendered
             rendered="$(mktemp)"
 
+            # RETURN only: an EXIT trap would fire after this function's
+            # `local rendered` has gone out of scope, which `set -u` turns
+            # into an "unbound variable" error. A hard errexit abort can
+            # therefore still leak one temp file, which is acceptable on an
+            # ephemeral runner.
+            trap 'rm -f "$rendered"' RETURN
+
+            # --env-file /dev/null on every invocation: Compose otherwise reads
+            # docker/.env automatically, and the quickstart tells operators to
+            # create one holding exactly the credentials these assertions
+            # control. Without it the checks pass in CI (which has no .env) but
+            # report false failures for anyone running them locally after
+            # following the quickstart, and the add-on render below — which
+            # deliberately unsets the variables to assert their defaults — would
+            # read whatever HUGEGRAPH_NETWORK/HUGEGRAPH_VERSION that .env holds.
+            # Pinning an empty env file makes both renders depend only on what
+            # each invocation sets explicitly.
+
             # Both cluster credentials are required and may not be empty.
-            if HUGEGRAPH_AUTH_TOKEN_SECRET=ci-test-secret \
-                 env -u HUGEGRAPH_ADMIN_PASSWORD \
-                 docker compose -f "$cluster" config -q >/dev/null 2>&1; then
-              echo "$cluster accepted an unset admin password" >&2
-              return 1
-            fi
-            if HUGEGRAPH_ADMIN_PASSWORD= \
-                 HUGEGRAPH_AUTH_TOKEN_SECRET=ci-test-secret \
-                 docker compose -f "$cluster" config -q >/dev/null 2>&1; then
-              echo "$cluster accepted an empty admin password" >&2
-              return 1
-            fi
-            if HUGEGRAPH_ADMIN_PASSWORD=ci-test-password \
-                 env -u HUGEGRAPH_AUTH_TOKEN_SECRET \
-                 docker compose -f "$cluster" config -q >/dev/null 2>&1; then
-              echo "$cluster accepted an unset token secret" >&2
-              return 1
-            fi
-            if HUGEGRAPH_ADMIN_PASSWORD=ci-test-password \
-                 HUGEGRAPH_AUTH_TOKEN_SECRET= \
-                 docker compose -f "$cluster" config -q >/dev/null 2>&1; then
-              echo "$cluster accepted an empty token secret" >&2
-              return 1
-            fi
+            # Each case asserts the guard fired for the *intended* variable:
+            # a bare non-zero exit would also be produced by a YAML error, a
+            # renamed file, or a missing docker binary.
+            assert_guard() { # assert_guard <blamed-var> <description>
+              local var="$1" desc="$2" err
+              if err="$(docker compose --env-file /dev/null -f "$cluster" \
+                          config -q 2>&1)"; then
+                echo "$cluster accepted $desc" >&2
+                return 1
+              fi
+              case "$err" in
+                *"$var"*) : ;;
+                *) echo "$cluster rejected $desc, but not because of $var: $err" >&2
+                   return 1 ;;
+              esac
+            }
+
+            ( unset HUGEGRAPH_ADMIN_PASSWORD
+              export HUGEGRAPH_AUTH_TOKEN_SECRET=ci-test-token-secret-32-bytes-long
+              assert_guard HUGEGRAPH_ADMIN_PASSWORD "an unset admin password" )
+            ( export HUGEGRAPH_ADMIN_PASSWORD=
+              export HUGEGRAPH_AUTH_TOKEN_SECRET=ci-test-token-secret-32-bytes-long
+              assert_guard HUGEGRAPH_ADMIN_PASSWORD "an empty admin password" )
+            ( unset HUGEGRAPH_AUTH_TOKEN_SECRET
+              export HUGEGRAPH_ADMIN_PASSWORD=ci-test-password
+              assert_guard HUGEGRAPH_AUTH_TOKEN_SECRET "an unset token secret" )
+            ( export HUGEGRAPH_ADMIN_PASSWORD=ci-test-password
+              export HUGEGRAPH_AUTH_TOKEN_SECRET=
+              assert_guard HUGEGRAPH_AUTH_TOKEN_SECRET "an empty token secret" )
 
             # The add-on alone must define Hubble and nothing else, join the
             # shared external network with its default name, and need no
             # credentials or overrides.
             env -u HUGEGRAPH_ADMIN_PASSWORD -u HUGEGRAPH_AUTH_TOKEN_SECRET \
                 -u HUGEGRAPH_NETWORK -u HUGEGRAPH_VERSION \
-              docker compose -f "$addon" config --format json > "$rendered"
+                -u HUBBLE_IMAGE -u HUBBLE_PULL_POLICY -u HUBBLE_PUBLISH_HOST \
+              docker compose --env-file /dev/null -f "$addon" config --format json > "$rendered"
             jq -e '
                 (.services | keys) == ["hubble"] and
                 .networks."hg-net".external == true and
                 .networks."hg-net".name == "hugegraph-net" and
+                (.services.hubble.networks | has("hg-net")) and
                 (.services.hubble | has("depends_on") | not) and
                 any(.services.hubble.volumes[];
                     .target == "/hubble/conf/hugegraph-hubble.properties" and
                     (.source | endswith("hugegraph-hubble-3x3.properties")))
+                and any(.services.hubble.volumes[];
+                    .source == "hg-hubble-db" and
+                    .target == "/hubble/db")
+                and any(.services.hubble.volumes[];
+                    .source == "hg-hubble-upload-files" and
+                    .target == "/hubble/upload-files")
               ' "$rendered" >/dev/null
+
+            # The cluster's own default network name must match the add-on's,
+            # or the attach flow and the cluster land on different networks.
+            # The combined render below pins an override, so it cannot catch a
+            # drifting default.
+            HUGEGRAPH_ADMIN_PASSWORD=ci-test-password \
+            HUGEGRAPH_AUTH_TOKEN_SECRET=ci-test-token-secret-32-bytes-long \
+              env -u HUGEGRAPH_NETWORK -u HUBBLE_IMAGE -u HUBBLE_PULL_POLICY \
+                  -u HUBBLE_PUBLISH_HOST \
+              docker compose --env-file /dev/null -f "$cluster" \
+                config --format json > "$rendered"
+            jq -e '.networks."hg-net".name == "hugegraph-net"' \
+              "$rendered" >/dev/null
 
             # The combined render carries the PD-registration and auth
             # settings on every server replica and keeps Hubble on loopback.
@@ -192,16 +238,18 @@ jobs:
             # CI fails if any file stops honoring the overrides (the add-on
             # render above covers the defaults).
             HUGEGRAPH_ADMIN_PASSWORD=ci-test-password \
-            HUGEGRAPH_AUTH_TOKEN_SECRET=ci-test-secret \
+            HUGEGRAPH_AUTH_TOKEN_SECRET=ci-test-token-secret-32-bytes-long \
             HUGEGRAPH_NETWORK=ci-test-net \
             HUGEGRAPH_VERSION=ci-test-tag \
-              docker compose -f "$cluster" -f "$addon" \
+              env -u HUBBLE_IMAGE -u HUBBLE_PULL_POLICY -u HUBBLE_PUBLISH_HOST \
+              docker compose --env-file /dev/null -f "$cluster" -f "$addon" \
                 config --format json > "$rendered"
             jq -e '
                 .name == "hugegraph-3x3" and
                 (.services | keys | length) == 10 and
                 .networks."hg-net".external == true and
                 .networks."hg-net".name == "ci-test-net" and
+                all(.services[]; .networks | has("hg-net")) and
                 .services.pd0.image == "hugegraph/pd:ci-test-tag" and
                 .services.store0.image == "hugegraph/store:ci-test-tag" and
                 .services.server0.image == "hugegraph/server:ci-test-tag" and
@@ -213,17 +261,17 @@ jobs:
                 .services.server1.environment.HG_SERVER_REST_URL ==
                   "http://server1:8080" and
                 .services.server1.environment.HG_SERVER_AUTH_TOKEN_SECRET ==
-                  "ci-test-secret" and
+                  "ci-test-token-secret-32-bytes-long" and
                 .services.server2.environment.HG_SERVER_REST_URL ==
                   "http://server2:8080" and
                 .services.server2.environment.HG_SERVER_AUTH_TOKEN_SECRET ==
-                  "ci-test-secret" and
+                  "ci-test-token-secret-32-bytes-long" and
                 .services.server0.environment.HG_SERVER_INIT_STORE_ENABLED ==
                   "false" and
                 .services.server0.environment.PASSWORD ==
                   "ci-test-password" and
                 .services.server0.environment.HG_SERVER_AUTH_TOKEN_SECRET ==
-                  "ci-test-secret" and
+                  "ci-test-token-secret-32-bytes-long" and
                 (.services.hubble | has("depends_on") | not) and
                 .services.hubble.pull_policy == "missing" and
                 (.services.hubble.healthcheck.test[1] |
@@ -234,7 +282,39 @@ jobs:
                     .target == 8088 and .published == "8088" and
                     .host_ip == "127.0.0.1")
               ' "$rendered" >/dev/null
-            rm -f "$rendered"
+
+            # Hubble's properties file is mounted, not rendered, so Compose
+            # validation alone cannot catch it drifting from the services it
+            # describes. Tie the two together: renaming a service, changing a
+            # container hostname, or moving a REST port must be reflected in
+            # both places or CI fails here. Values are derived from the
+            # rendered model (hostnames and ports included) so the assertions
+            # cannot silently agree with a stale file.
+            local props="docker/hugegraph-hubble-3x3.properties"
+            local pd_peers store_targets cluster_name pd_rest
+            assert_props() { # assert_props <exact-line> <what-it-must-match>
+              grep -Fqx "$1" "$props" ||
+                { echo "$props: expected line '$1' ($2)" >&2; return 1; }
+            }
+            cluster_name="$(jq -r '.services.server0.environment.HG_SERVER_CLUSTER' \
+                              "$rendered")"
+            pd_peers="$(jq -r '.services.server0.environment.HG_SERVER_PD_PEERS' \
+                          "$rendered")"
+            store_targets="[$(jq -r '[.services | to_entries[]
+                                      | select(.key | startswith("store"))
+                                      | "http://" + .value.hostname + ":"
+                                        + (.value.environment.HG_STORE_REST_PORT)]
+                                     | sort | join(",")' "$rendered")]"
+            pd_rest="$(jq -r --arg h "$(printf '%s' "${pd_peers}" | cut -d, -f1 | cut -d: -f1)" \
+                         '.services | to_entries[]
+                          | select(.value.hostname == $h)
+                          | .value.hostname + ":" + .value.environment.HG_PD_REST_PORT' \
+                         "$rendered")"
+            assert_props "cluster=${cluster_name}" "matches HG_SERVER_CLUSTER"
+            assert_props "pd.peers=${pd_peers}" "matches HG_SERVER_PD_PEERS"
+            assert_props "pd.server=${pd_rest}" "names a real PD REST endpoint"
+            assert_props "operations.store.allowed_targets=${store_targets}" \
+              "lists every Store REST endpoint"
           }
 
           check_cluster_compose

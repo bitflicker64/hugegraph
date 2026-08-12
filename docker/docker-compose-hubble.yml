@@ -25,6 +25,10 @@ networks:
     external: true
     name: ${HUGEGRAPH_NETWORK:-hugegraph-net}
 
+volumes:
+  hg-hubble-db:
+  hg-hubble-upload-files:
+
 services:
   hubble:
     # Pin a release via HUGEGRAPH_VERSION in docker/.env; unset, the image
@@ -39,6 +43,8 @@ services:
       - "${HUBBLE_PUBLISH_HOST:-127.0.0.1}:8088:8088"
     volumes:
       - ./hugegraph-hubble-3x3.properties:/hubble/conf/hugegraph-hubble.properties:ro
+      - hg-hubble-db:/hubble/db
+      - hg-hubble-upload-files:/hubble/upload-files
     healthcheck:
       test: ["CMD-SHELL", "body=$$(curl -fsS http://127.0.0.1:8088/about) && printf '%s' \"$$body\" | grep -q '\"status\":200' && printf '%s' \"$$body\" | grep -q '\"name\":\"hugegraph-hubble\"'"]
       interval: 10s

@@ -182,8 +182,11 @@ Basic-auth *user* is one of its internal service names and never validates
 the password — so any client on the network can read and drive them. Note
 that this stack depends on that behaviour: Hubble reaches PD as the service
 name `hubble` with an empty password, so tightening PD's credential check
-would also break Hubble's operations view. Any container on the host can
-also join the network by declaring the well-known name. One-time setup:
+would also break Hubble's operations view. PD and Store control-plane ports,
+and the Server host ports, bind to loopback by default; expose them only by
+setting the corresponding host variables with an explicit network ACL/TLS plan.
+Any container on the host can still join the external network by declaring the
+well-known name. One-time setup:
 write the required credentials to a mode-600 `docker/.env` and create the
 network.
 The cluster file requires both credentials — the admin password enables
@@ -201,18 +204,34 @@ on every Compose subcommand, including `down`.
   # Keep appends on their own lines even if the file was hand-edited.
   [ ! -s .env ] || [ -z "$(tail -c1 .env)" ] || printf '\n' >> .env
   pat='^[[:space:]]*(export[[:space:]]+)?'
-  if ! grep -Eq "${pat}HUGEGRAPH_ADMIN_PASSWORD=" .env; then
+  if ! grep -Eq "${pat}HUGEGRAPH_ADMIN_PASSWORD[[:space:]]*=" .env; then
     admin_password="$(openssl rand -base64 12)"
     printf "HUGEGRAPH_ADMIN_PASSWORD='%s'\n" "${admin_password}" >> .env
     unset admin_password
   fi
-  if ! grep -Eq "${pat}HUGEGRAPH_AUTH_TOKEN_SECRET=" .env; then
+  if ! grep -Eq "${pat}HUGEGRAPH_AUTH_TOKEN_SECRET[[:space:]]*=" .env; then
     token_secret="$(openssl rand -hex 32)"
     printf "HUGEGRAPH_AUTH_TOKEN_SECRET='%s'\n" "${token_secret}" >> .env
     unset token_secret
   fi
-  admin_value="$(sed -nE "s/${pat}HUGEGRAPH_ADMIN_PASSWORD='([^']*)'[[:space:]]*$/\\1/p" .env | tail -n1)"
-  token_value="$(sed -nE "s/${pat}HUGEGRAPH_AUTH_TOKEN_SECRET='([^']*)'[[:space:]]*$/\\1/p" .env | tail -n1)"
+  # Only the single-quoted format generated above is accepted. Parse values as
+  # data; do not source .env as shell code. Duplicate keys and other dotenv
+  # syntax are rejected instead of being silently reinterpreted.
+  read_dotenv_value() {
+    key="$1"
+    key_pattern="^[[:space:]]*(export[[:space:]]+)?${key}[[:space:]]*=[[:space:]]*"
+    count="$(grep -Ec "${key_pattern}" .env || true)"
+    [ "${count}" -eq 1 ] || return 1
+    sed -nE "s/${key_pattern}'([^']*)'[[:space:]]*$/\\2/p" .env
+  }
+  if ! admin_value="$(read_dotenv_value HUGEGRAPH_ADMIN_PASSWORD)"; then
+    echo "HUGEGRAPH_ADMIN_PASSWORD must use the documented single-quoted format" >&2
+    exit 1
+  fi
+  if ! token_value="$(read_dotenv_value HUGEGRAPH_AUTH_TOKEN_SECRET)"; then
+    echo "HUGEGRAPH_AUTH_TOKEN_SECRET must use the documented single-quoted format" >&2
+    exit 1
+  fi
   [ -n "${admin_value}" ] || {
     echo "HUGEGRAPH_ADMIN_PASSWORD must be non-empty in docker/.env" >&2
     exit 1
@@ -246,19 +265,27 @@ docker compose -f docker-compose-3pd-3store-3server.yml up -d
 docker compose -f docker-compose-3pd-3store-3server.yml down -v
 ```
 
+Each Server registers its `HG_SERVER_REST_URL` value with PD. The defaults
+(`server0`, `server1`, and `server2`) are Docker-network names and are therefore
+correct for Hubble and other clients attached to `hugegraph-net`, but they are
+not resolvable from an unrelated host network. For a PD-aware client outside
+the Docker network, set `HUGEGRAPH_SERVER0_REST_URL`,
+`HUGEGRAPH_SERVER1_REST_URL`, and `HUGEGRAPH_SERVER2_REST_URL` to addresses
+that resolve from both the Server containers and that client, and expose the
+matching host ports with `HUGEGRAPH_SERVER_PUBLISH_HOST` only when required.
+
 Pin a release by setting `HUGEGRAPH_VERSION` in `docker/.env` — the
 cluster, the Hubble add-on, and the single-node quickstart file all read
 it from there, so those versions cannot drift apart
 (`docker-compose.dev.yml` builds PD/Store/Server from source and defaults
 Hubble to `hugegraph/hubble:latest`; set `HUBBLE_IMAGE` to pin it).
 Unpinned, the images default to `latest`; note the authenticated PD/Hubble
-integration requires a release newer than `1.7.x`. On an older image the
-Server silently ignores `PASSWORD` and `HG_SERVER_AUTH_TOKEN_SECRET`, comes
-up healthy, and leaves you an unauthenticated cluster — the 401 check under
-"Verify the cluster is healthy" below is what detects this, so run it.
-Because the cluster files use `pull_policy: missing`, an already-pulled
-`latest` is never refreshed by `up -d` — pull explicitly or pin to pick up
-new releases.
+integration requires a release newer than `1.7.x`. The cluster and add-on use
+`pull_policy: always` by default so a cached older image cannot silently satisfy
+the auth-sensitive deployment. The Server healthcheck also requires an
+unauthenticated graph request to return 401 and an authenticated request to
+return 200; an incompatible image therefore remains unhealthy. Pin a tested
+release in `docker/.env` for reproducible deployments.
 
 > [!NOTE]
 > Upgrading an existing 3-node deployment:
@@ -323,13 +350,24 @@ for port in 8080 8081 8082; do
     "http://localhost:${port}/graphs/hugegraph/schema/vertexlabels"
 done
 
-# And a signed-in read must succeed. Compose reads docker/.env by itself, but
-# your shell does not — load it first. Passing the credential through
+# And a signed-in read must succeed. Parse the generated single-quoted value
+# without executing docker/.env as shell code. Passing the credential through
 # --config keeps it out of argv, where `ps` would expose it to other users.
-set -a; . ./.env; set +a
+read_dotenv_value() {
+  key="$1"
+  key_pattern="^[[:space:]]*(export[[:space:]]+)?${key}[[:space:]]*=[[:space:]]*"
+  count="$(grep -Ec "${key_pattern}" .env || true)"
+  [ "${count}" -eq 1 ] || return 1
+  sed -nE "s/${key_pattern}'([^']*)'[[:space:]]*$/\\2/p" .env
+}
+HUGEGRAPH_ADMIN_PASSWORD="$(read_dotenv_value HUGEGRAPH_ADMIN_PASSWORD)" || {
+  echo "HUGEGRAPH_ADMIN_PASSWORD must use the documented single-quoted format" >&2
+  exit 1
+}
 curl -s -o /dev/null -w '%{http_code}\n' \
   --config <(printf 'user = "admin:%s"\n' "${HUGEGRAPH_ADMIN_PASSWORD}") \
   http://localhost:8080/graphs/hugegraph/schema/vertexlabels
+unset HUGEGRAPH_ADMIN_PASSWORD
 ```
 
 `200` from the second command with `401` from all three of the first means
@@ -353,9 +391,11 @@ with no failover, so if that PD is down the operations view goes blind even
 though the cluster still has quorum — repoint it at a surviving PD. The
 operations view also reports one `SERVER` node, not three: it describes the
 replica Hubble is currently talking to, not the whole Server tier. The add-on
-stores Hubble's H2 database and uploaded files in named volumes
-`hg-hubble-db` and `hg-hubble-upload-files`, so recreating the container does
-not discard that state.
+stores Hubble's H2 database and uploaded files in explicit volumes named
+`hugegraph-hubble-db` and `hugegraph-hubble-upload-files` by default. The H2
+volume mounts `/hubble`, the image's actual working/data boundary, while the
+upload volume mounts `/hubble/upload-files`. The explicit names are independent
+of the Compose project, so attach and combined flows share state.
 
 Sign in at `http://localhost:8088` as `admin` with the
 `HUGEGRAPH_ADMIN_PASSWORD` from `docker/.env`. Hubble binds to host
@@ -368,8 +408,9 @@ that runs without those credentials, which is what you want against a
 cluster someone else started. Otherwise use the combined flow, including to
 add Hubble to an already-running cluster (`up -d --no-deps hubble`).
 
-The two flows below create Hubble in different Compose projects, so manage
-Hubble with the same flags you started it with: the attach flow always uses
+The two flows below create Hubble in different Compose projects, but the
+explicit volume names above make their Hubble state shared. Manage Hubble with
+the same flags you started it with: the attach flow always uses
 `-p hugegraph-hubble -f docker-compose-hubble.yml`, the combined flow always
 uses both `-f` flags. The explicit `-p` keeps the attach project independent
 of the directory name and of other Compose projects.
@@ -571,9 +612,16 @@ add-on = `docker-compose-hubble.yml`):
 | `HUGEGRAPH_SERVER_IMAGE` | single | `hugegraph/server:<version>` | Complete Server image reference |
 | `HUGEGRAPH_SERVER_PULL_POLICY` | single | `always` (`build` for dev) | Server pull policy |
 | `HUBBLE_IMAGE` | single, add-on | `hugegraph/hubble:<version>` | Complete Hubble image reference |
-| `HUBBLE_PULL_POLICY` | single, add-on | `always` (`missing` for dev and the add-on) | Hubble pull policy |
+| `HUBBLE_PULL_POLICY` | single, add-on | `always` (`missing` for dev) | Hubble pull policy |
 | `HUBBLE_PUBLISH_HOST` | single, add-on | `127.0.0.1` | Hubble host bind address; remote access requires an HTTPS reverse proxy |
 | `HUGEGRAPH_NETWORK` | cluster, add-on | `hugegraph-net` | Pre-created external Docker network shared by the 3-node cluster and the Hubble add-on; the single-node files use their own project bridge instead |
+| `HUGEGRAPH_CONTROL_PLANE_HOST` | cluster | `127.0.0.1` | Host bind address for PD and Store REST/gRPC/Raft ports; change only with an explicit network ACL/TLS plan |
+| `HUGEGRAPH_SERVER_PUBLISH_HOST` | cluster | `127.0.0.1` | Host bind address for the three Server REST ports |
+| `HUGEGRAPH_SERVER0_REST_URL` | cluster | `http://server0:8080` | Server 0 URL registered with PD; it must resolve from the Server container and every PD-aware client |
+| `HUGEGRAPH_SERVER1_REST_URL` | cluster | `http://server1:8080` | Server 1 URL registered with PD; it must resolve from the Server container and every PD-aware client |
+| `HUGEGRAPH_SERVER2_REST_URL` | cluster | `http://server2:8080` | Server 2 URL registered with PD; it must resolve from the Server container and every PD-aware client |
+| `HUBBLE_DB_VOLUME` | add-on | `hugegraph-hubble-db` | Explicit Hubble data volume; keep stable when switching attach and combined flows |
+| `HUBBLE_UPLOAD_VOLUME` | add-on | `hugegraph-hubble-upload-files` | Explicit Hubble upload volume; keep stable when switching attach and combined flows |
 | `HUGEGRAPH_ADMIN_PASSWORD` | single, cluster | required (`docker/.env`) | Initial admin password; no public default is provided |
 | `HUGEGRAPH_AUTH_TOKEN_SECRET` | single, cluster | generated (single); **required** (cluster) | JWT signing secret; explicit values must be at least 32 bytes. The cluster file requires it so all Server replicas validate each other's tokens |
 

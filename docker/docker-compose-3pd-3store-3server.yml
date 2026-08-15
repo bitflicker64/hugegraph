@@ -39,7 +39,7 @@ x-pd-common: &pd-common
   # Pin a release via HUGEGRAPH_VERSION in docker/.env; unset, the image
   # tags default to latest. All Compose files here read the same variable.
   image: hugegraph/pd:${HUGEGRAPH_VERSION:-latest}
-  pull_policy: missing
+  pull_policy: always
   restart: unless-stopped
   networks: [hg-net]
   healthcheck:
@@ -51,7 +51,7 @@ x-pd-common: &pd-common
 
 x-store-common: &store-common
   image: hugegraph/store:${HUGEGRAPH_VERSION:-latest}
-  pull_policy: missing
+  pull_policy: always
   restart: unless-stopped
   networks: [hg-net]
   depends_on:
@@ -85,7 +85,7 @@ x-server-env: &server-env
 
 x-server-common: &server-common
   image: hugegraph/server:${HUGEGRAPH_VERSION:-latest}
-  pull_policy: missing
+  pull_policy: always
   restart: unless-stopped
   networks: [hg-net]
   depends_on:
@@ -93,9 +93,11 @@ x-server-common: &server-common
     store1: { condition: service_healthy }
     store2: { condition: service_healthy }
   healthcheck:
-    # With HG_SERVER_REST_URL set, the REST server binds that URL's
-    # hostname rather than localhost, so probe the bound address.
-    test: ["CMD-SHELL", "curl -fsS $${HG_SERVER_REST_URL}/versions >/dev/null || exit 1"]
+    # Prove the image actually enforces authentication. Older cached images
+    # may accept PASSWORD but ignore it while still returning healthy on
+    # /versions, so readiness requires both 401 without credentials and 200
+    # with the configured admin password.
+    test: ["CMD-SHELL", "base=$${HG_SERVER_REST_URL}; unauth=$$(curl -s -o /dev/null -w '%{http_code}' \"$${base}/graphs/hugegraph/schema/vertexlabels\"); auth=$$(curl -s -o /dev/null -w '%{http_code}' -u \"admin:$${PASSWORD}\" \"$${base}/graphs/hugegraph/schema/vertexlabels\"); test \"$${unauth}\" = 401 && test \"$${auth}\" = 200"]
     interval: 10s
     timeout: 5s
     retries: 30
@@ -118,7 +120,9 @@ services:
       HG_PD_INITIAL_STORE_LIST: store0:8500,store1:8500,store2:8500
       HG_PD_DATA_PATH: /hugegraph-pd/pd_data
       HG_PD_INITIAL_STORE_COUNT: 3
-    ports: ["8620:8620", "8686:8686"]
+    ports:
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8620:8620"
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8686:8686"
     volumes:
       - hg-pd0-data:/hugegraph-pd/pd_data
 
@@ -135,7 +139,9 @@ services:
       HG_PD_INITIAL_STORE_LIST: store0:8500,store1:8500,store2:8500
       HG_PD_DATA_PATH: /hugegraph-pd/pd_data
       HG_PD_INITIAL_STORE_COUNT: 3
-    ports: ["8621:8620", "8687:8686"]
+    ports:
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8621:8620"
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8687:8686"
     volumes:
       - hg-pd1-data:/hugegraph-pd/pd_data
 
@@ -152,7 +158,9 @@ services:
       HG_PD_INITIAL_STORE_LIST: store0:8500,store1:8500,store2:8500
       HG_PD_DATA_PATH: /hugegraph-pd/pd_data
       HG_PD_INITIAL_STORE_COUNT: 3
-    ports: ["8622:8620", "8688:8686"]
+    ports:
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8622:8620"
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8688:8686"
     volumes:
       - hg-pd2-data:/hugegraph-pd/pd_data
 
@@ -168,7 +176,10 @@ services:
       HG_STORE_REST_PORT: "8520"
       HG_STORE_RAFT_ADDRESS: store0:8510
       HG_STORE_DATA_PATH: /hugegraph-store/storage
-    ports: ["8500:8500", "8510:8510", "8520:8520"]
+    ports:
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8500:8500"
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8510:8510"
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8520:8520"
     volumes:
       - hg-store0-data:/hugegraph-store/storage
 
@@ -183,7 +194,10 @@ services:
       HG_STORE_REST_PORT: "8520"
       HG_STORE_RAFT_ADDRESS: store1:8510
       HG_STORE_DATA_PATH: /hugegraph-store/storage
-    ports: ["8501:8500", "8511:8510", "8521:8520"]
+    ports:
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8501:8500"
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8511:8510"
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8521:8520"
     volumes:
       - hg-store1-data:/hugegraph-store/storage
 
@@ -198,7 +212,10 @@ services:
       HG_STORE_REST_PORT: "8520"
       HG_STORE_RAFT_ADDRESS: store2:8510
       HG_STORE_DATA_PATH: /hugegraph-store/storage
-    ports: ["8502:8500", "8512:8510", "8522:8520"]
+    ports:
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8502:8500"
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8512:8510"
+      - "${HUGEGRAPH_CONTROL_PLANE_HOST:-127.0.0.1}:8522:8520"
     volumes:
       - hg-store2-data:/hugegraph-store/storage
 
@@ -209,8 +226,9 @@ services:
     hostname: server0
     environment:
       <<: *server-env
-      HG_SERVER_REST_URL: http://server0:8080
-    ports: ["8080:8080"]
+      HG_SERVER_REST_URL: ${HUGEGRAPH_SERVER0_REST_URL:-http://server0:8080}
+    ports:
+      - "${HUGEGRAPH_SERVER_PUBLISH_HOST:-127.0.0.1}:8080:8080"
 
   server1:
     <<: *server-common
@@ -218,8 +236,9 @@ services:
     hostname: server1
     environment:
       <<: *server-env
-      HG_SERVER_REST_URL: http://server1:8080
-    ports: ["8081:8080"]
+      HG_SERVER_REST_URL: ${HUGEGRAPH_SERVER1_REST_URL:-http://server1:8080}
+    ports:
+      - "${HUGEGRAPH_SERVER_PUBLISH_HOST:-127.0.0.1}:8081:8080"
 
   server2:
     <<: *server-common
@@ -227,5 +246,6 @@ services:
     hostname: server2
     environment:
       <<: *server-env
-      HG_SERVER_REST_URL: http://server2:8080
-    ports: ["8082:8080"]
+      HG_SERVER_REST_URL: ${HUGEGRAPH_SERVER2_REST_URL:-http://server2:8080}
+    ports:
+      - "${HUGEGRAPH_SERVER_PUBLISH_HOST:-127.0.0.1}:8082:8080"

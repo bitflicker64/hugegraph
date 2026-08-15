@@ -27,14 +27,16 @@ networks:
 
 volumes:
   hg-hubble-db:
+    name: ${HUBBLE_DB_VOLUME:-hugegraph-hubble-db}
   hg-hubble-upload-files:
+    name: ${HUBBLE_UPLOAD_VOLUME:-hugegraph-hubble-upload-files}
 
 services:
   hubble:
     # Pin a release via HUGEGRAPH_VERSION in docker/.env; unset, the image
     # tag defaults to latest.
     image: ${HUBBLE_IMAGE:-hugegraph/hubble:${HUGEGRAPH_VERSION:-latest}}
-    pull_policy: ${HUBBLE_PULL_POLICY:-missing}
+    pull_policy: ${HUBBLE_PULL_POLICY:-always}
     container_name: hg-hubble
     hostname: hubble
     restart: unless-stopped
@@ -43,7 +45,10 @@ services:
       - "${HUBBLE_PUBLISH_HOST:-127.0.0.1}:8088:8088"
     volumes:
       - ./hugegraph-hubble-3x3.properties:/hubble/conf/hugegraph-hubble.properties:ro
-      - hg-hubble-db:/hubble/db
+      # Hubble's default jdbc:h2:file:./db resolves to /hubble/db.mv.db.
+      # Mount the parent so the database file, lock files, and app state stay
+      # inside the named volume instead of turning /hubble/db into a directory.
+      - hg-hubble-db:/hubble
       - hg-hubble-upload-files:/hubble/upload-files
     healthcheck:
       test: ["CMD-SHELL", "body=$$(curl -fsS http://127.0.0.1:8088/about) && printf '%s' \"$$body\" | grep -q '\"status\":200' && printf '%s' \"$$body\" | grep -q '\"name\":\"hugegraph-hubble\"'"]

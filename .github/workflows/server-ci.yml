@@ -217,10 +217,13 @@ jobs:
                     (.source | endswith("hugegraph-hubble-3x3.properties")))
                 and any(.services.hubble.volumes[];
                     .source == "hg-hubble-db" and
-                    .target == "/hubble/db")
+                    .target == "/hubble")
                 and any(.services.hubble.volumes[];
                     .source == "hg-hubble-upload-files" and
                     .target == "/hubble/upload-files")
+                and .volumes."hg-hubble-db".name == "hugegraph-hubble-db"
+                and .volumes."hg-hubble-upload-files".name ==
+                    "hugegraph-hubble-upload-files"
               ' "$rendered" >/dev/null
 
             # The cluster's own default network name must match the add-on's,
@@ -249,6 +252,7 @@ jobs:
               docker compose --env-file /dev/null -f "$cluster" -f "$addon" \
                 config --format json > "$rendered"
             jq -e '
+                . as $root |
                 .name == "hugegraph-3x3" and
                 (.services | keys | length) == 10 and
                 .networks."hg-net".external == true and
@@ -258,33 +262,33 @@ jobs:
                 .services.store0.image == "hugegraph/store:ci-test-tag" and
                 .services.server0.image == "hugegraph/server:ci-test-tag" and
                 .services.hubble.image == "hugegraph/hubble:ci-test-tag" and
-                .services.server0.environment.HG_SERVER_USE_PD == "true" and
-                .services.server0.environment.HG_SERVER_CLUSTER == "hg" and
+                all(["server0", "server1", "server2"][];
+                  $root.services[.].environment.HG_SERVER_USE_PD == "true" and
+                  $root.services[.].environment.HG_SERVER_CLUSTER == "hg" and
+                  $root.services[.].environment.HG_SERVER_INIT_STORE_ENABLED ==
+                    "false" and
+                  $root.services[.].environment.PASSWORD == "ci-test-password" and
+                  $root.services[.].environment.HG_SERVER_AUTH_TOKEN_SECRET ==
+                    "ci-test-token-secret-32-bytes-long") and
                 .services.server0.environment.HG_SERVER_REST_URL ==
                   "http://server0:8080" and
                 .services.server1.environment.HG_SERVER_REST_URL ==
                   "http://server1:8080" and
-                .services.server1.environment.HG_SERVER_AUTH_TOKEN_SECRET ==
-                  "ci-test-token-secret-32-bytes-long" and
                 .services.server2.environment.HG_SERVER_REST_URL ==
                   "http://server2:8080" and
-                .services.server2.environment.HG_SERVER_AUTH_TOKEN_SECRET ==
-                  "ci-test-token-secret-32-bytes-long" and
-                .services.server0.environment.HG_SERVER_INIT_STORE_ENABLED ==
-                  "false" and
-                .services.server0.environment.PASSWORD ==
-                  "ci-test-password" and
-                .services.server0.environment.HG_SERVER_AUTH_TOKEN_SECRET ==
-                  "ci-test-token-secret-32-bytes-long" and
                 (.services.hubble | has("depends_on") | not) and
-                .services.hubble.pull_policy == "missing" and
+                .services.hubble.pull_policy == "always" and
                 (.services.hubble.healthcheck.test[1] |
                   contains("http://127.0.0.1:8088/about") and
                   contains("\"status\":200") and
                   contains("\"name\":\"hugegraph-hubble\"")) and
                 any(.services.hubble.ports[];
                     .target == 8088 and .published == "8088" and
-                    .host_ip == "127.0.0.1")
+                    .host_ip == "127.0.0.1") and
+                all(["pd0", "pd1", "pd2", "store0", "store1", "store2"][];
+                  all($root.services[.].ports[]; .host_ip == "127.0.0.1")) and
+                all(["server0", "server1", "server2"][];
+                  all($root.services[.].ports[]; .host_ip == "127.0.0.1"))
               ' "$rendered" >/dev/null
 
             # Hubble's properties file is mounted, not rendered, so Compose
@@ -315,6 +319,7 @@ jobs:
                           | .value.hostname + ":" + .value.environment.HG_PD_REST_PORT' \
                          "$rendered")"
             assert_props "cluster=${cluster_name}" "matches HG_SERVER_CLUSTER"
+            assert_props "pd.enabled=true" "keeps Hubble in PD mode"
             assert_props "pd.peers=${pd_peers}" "matches HG_SERVER_PD_PEERS"
             assert_props "pd.server=${pd_rest}" "names a real PD REST endpoint"
             assert_props "operations.store.allowed_targets=${store_targets}" \
@@ -322,6 +327,80 @@ jobs:
           }
 
           check_cluster_compose
+
+      - name: Run distributed Compose auth and attach smoke test
+        if: ${{ env.BACKEND == 'rocksdb' }}
+        run: |
+          set -euo pipefail
+          command -v docker >/dev/null 2>&1
+          docker compose version >/dev/null
+          docker info >/dev/null
+
+          cluster="docker/docker-compose-3pd-3store-3server.yml"
+          addon="docker/docker-compose-hubble.yml"
+          run_id="${GITHUB_RUN_ID:-local}"
+          network="hugegraph-ci-${run_id}"
+          db_volume="hugegraph-ci-${run_id}-db"
+          upload_volume="hugegraph-ci-${run_id}-uploads"
+          admin_password='ci-smoke-admin-password'
+          token_secret='ci-smoke-token-secret-32-bytes-long'
+
+          cleanup() {
+            HUGEGRAPH_NETWORK="$network" \
+            HUGEGRAPH_ADMIN_PASSWORD="$admin_password" \
+            HUGEGRAPH_AUTH_TOKEN_SECRET="$token_secret" \
+            HUBBLE_DB_VOLUME="$db_volume" \
+            HUBBLE_UPLOAD_VOLUME="$upload_volume" \
+              docker compose --env-file /dev/null -f "$cluster" -f "$addon" \
+                down -v --remove-orphans >/dev/null 2>&1 || true
+            docker network rm "$network" >/dev/null 2>&1 || true
+            docker volume rm "$db_volume" "$upload_volume" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          docker network create "$network"
+
+          # First exercise the attach precondition: cluster alone is healthy,
+          # graph requests require auth, and valid credentials succeed.
+          HUGEGRAPH_NETWORK="$network" \
+          HUGEGRAPH_ADMIN_PASSWORD="$admin_password" \
+          HUGEGRAPH_AUTH_TOKEN_SECRET="$token_secret" \
+            docker compose --env-file /dev/null -f "$cluster" up -d --wait
+          cluster_ids_before="$(docker compose --env-file /dev/null -f "$cluster" \
+            ps -q pd0 pd1 pd2 store0 store1 store2 server0 server1 server2 | sort)"
+          for port in 8080 8081 8082; do
+            code="$(curl --retry 30 --retry-delay 2 --retry-all-errors -s -o /dev/null \
+              -w '%{http_code}' "http://127.0.0.1:${port}/graphs/hugegraph/schema/vertexlabels")"
+            test "$code" = 401
+            code="$(curl --retry 30 --retry-delay 2 --retry-all-errors -s -o /dev/null \
+              -w '%{http_code}' -u "admin:${admin_password}" \
+              "http://127.0.0.1:${port}/graphs/hugegraph/schema/vertexlabels")"
+            test "$code" = 200
+          done
+
+          # Attach Hubble without changing any cluster container.
+          HUGEGRAPH_NETWORK="$network" \
+          HUBBLE_DB_VOLUME="$db_volume" \
+          HUBBLE_UPLOAD_VOLUME="$upload_volume" \
+            docker compose --env-file /dev/null -p "hugegraph-ci-attach-${run_id}" \
+              -f "$addon" up -d --wait
+          curl --retry 30 --retry-delay 2 --retry-all-errors -fsS \
+            http://127.0.0.1:8088/about | grep -q '"name":"hugegraph-hubble"'
+          cluster_ids_after="$(docker compose --env-file /dev/null -f "$cluster" \
+            ps -q pd0 pd1 pd2 store0 store1 store2 server0 server1 server2 | sort)"
+          test "$cluster_ids_before" = "$cluster_ids_after"
+          docker compose --env-file /dev/null -p "hugegraph-ci-attach-${run_id}" \
+            -f "$addon" down
+
+          # The combined flow must reuse the same Hubble volumes.
+          HUGEGRAPH_NETWORK="$network" \
+          HUGEGRAPH_ADMIN_PASSWORD="$admin_password" \
+          HUGEGRAPH_AUTH_TOKEN_SECRET="$token_secret" \
+          HUBBLE_DB_VOLUME="$db_volume" \
+          HUBBLE_UPLOAD_VOLUME="$upload_volume" \
+            docker compose --env-file /dev/null \
+              -f "$cluster" -f "$addon" up -d --wait
+          curl --retry 30 --retry-delay 2 --retry-all-errors -fsS \
+            http://127.0.0.1:8088/about | grep -q '"name":"hugegraph-hubble"'
 
       - name: Run check_port unit tests
         if: ${{ env.BACKEND == 'rocksdb' }}

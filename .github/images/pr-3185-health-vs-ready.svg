@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 1010" width="1300" height="1010" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d94a38"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2e6fd8"/>
+    </marker>
+  </defs>
+  <rect width="1300" height="1010" fill="#ffffff"/>
+
+  <text x="650" y="78" text-anchor="middle" font-size="46" font-weight="700" fill="#1a1a1a">PD /v1/health vs /v1/ready</text>
+  <line x1="650" y1="120" x2="650" y2="870" stroke="#c8c8c8" stroke-width="2"/>
+
+  <!-- ===================== TODAY ===================== -->
+  <text x="330" y="160" text-anchor="middle" font-size="38" font-weight="700" fill="#c0392b">TODAY</text>
+
+  <rect x="110" y="185" width="440" height="58" rx="10" fill="#fdecea" stroke="#d94a38" stroke-width="3"/>
+  <text x="330" y="223" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">PD process starts</text>
+  <line x1="330" y1="245" x2="330" y2="279" stroke="#d94a38" stroke-width="3" marker-end="url(#arrow-red)"/>
+
+  <rect x="110" y="283" width="440" height="58" rx="10" fill="#fdecea" stroke="#d94a38" stroke-width="3"/>
+  <text x="330" y="321" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">Spring listener up</text>
+  <line x1="330" y1="343" x2="330" y2="377" stroke="#d94a38" stroke-width="3" marker-end="url(#arrow-red)"/>
+
+  <rect x="110" y="381" width="440" height="58" rx="10" fill="#fdecea" stroke="#d94a38" stroke-width="3"/>
+  <text x="330" y="419" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">/v1/health returns 200</text>
+  <line x1="330" y1="441" x2="330" y2="475" stroke="#d94a38" stroke-width="3" marker-end="url(#arrow-red)"/>
+
+  <rect x="110" y="479" width="440" height="84" rx="10" fill="#fdecea" stroke="#d94a38" stroke-width="3"/>
+  <text x="330" y="514" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">Raft loses leader</text>
+  <text x="330" y="545" text-anchor="middle" font-size="20" font-weight="700" fill="#555555">2 of 3 PDs gone</text>
+  <line x1="330" y1="565" x2="330" y2="599" stroke="#d94a38" stroke-width="3" marker-end="url(#arrow-red)"/>
+
+  <rect x="110" y="603" width="440" height="84" rx="10" fill="#fdecea" stroke="#d94a38" stroke-width="3"/>
+  <text x="330" y="638" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">/v1/health still 200</text>
+  <text x="330" y="669" text-anchor="middle" font-size="20" font-weight="700" fill="#555555">26 of 26 samples, ~166s</text>
+  <line x1="330" y1="689" x2="330" y2="723" stroke="#d94a38" stroke-width="3" marker-end="url(#arrow-red)"/>
+
+  <rect x="110" y="727" width="440" height="92" rx="10" fill="#f7c1bc" stroke="#c0392b" stroke-width="3"/>
+  <text x="330" y="765" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">Probes pass, Stores released</text>
+  <text x="330" y="797" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">writes fail</text>
+
+  <!-- ===================== WITH THIS PR ===================== -->
+  <text x="970" y="160" text-anchor="middle" font-size="38" font-weight="700" fill="#1a5fd0">WITH THIS PR</text>
+
+  <rect x="750" y="185" width="440" height="58" rx="10" fill="#e9f0fc" stroke="#2e6fd8" stroke-width="3"/>
+  <text x="970" y="223" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">PD process starts</text>
+  <line x1="970" y1="245" x2="970" y2="279" stroke="#2e6fd8" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <rect x="750" y="283" width="440" height="58" rx="10" fill="#e9f0fc" stroke="#2e6fd8" stroke-width="3"/>
+  <text x="970" y="321" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">Spring listener up</text>
+  <line x1="970" y1="343" x2="970" y2="377" stroke="#2e6fd8" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <rect x="750" y="381" width="440" height="84" rx="10" fill="#e9f0fc" stroke="#2e6fd8" stroke-width="3"/>
+  <text x="970" y="416" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">/v1/health returns 200</text>
+  <text x="970" y="447" text-anchor="middle" font-size="20" font-weight="700" fill="#555555">liveness only, unchanged</text>
+  <line x1="970" y1="467" x2="970" y2="501" stroke="#2e6fd8" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <rect x="750" y="505" width="440" height="84" rx="10" fill="#e9f0fc" stroke="#2e6fd8" stroke-width="3"/>
+  <text x="970" y="540" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">/v1/ready checks raft</text>
+  <text x="970" y="571" text-anchor="middle" font-size="20" font-weight="700" fill="#555555">node active and leader known</text>
+  <line x1="970" y1="591" x2="970" y2="625" stroke="#2e6fd8" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <rect x="750" y="629" width="440" height="106" rx="10" fill="#e9f0fc" stroke="#2e6fd8" stroke-width="3"/>
+  <text x="970" y="664" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">Raft loses leader</text>
+  <text x="970" y="696" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">/v1/ready returns 503</text>
+  <text x="970" y="722" text-anchor="middle" font-size="20" font-weight="700" fill="#555555">leader null, hg_raft_has_leader 0</text>
+  <line x1="970" y1="737" x2="970" y2="771" stroke="#2e6fd8" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <rect x="750" y="775" width="440" height="92" rx="10" fill="#dff5e3" stroke="#2e9e4f" stroke-width="3"/>
+  <text x="970" y="813" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">Probes hold, Stores wait</text>
+  <text x="970" y="845" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a">until quorum is back</text>
+
+  <!-- ===================== takeaway ===================== -->
+  <rect x="180" y="900" width="940" height="84" rx="10" fill="#eaf7ec" stroke="#2e9e4f" stroke-width="3"/>
+  <text x="650" y="935" text-anchor="middle" font-size="25" font-weight="700" fill="#1a1a1a">Gate on /v1/ready, keep /v1/health for liveness</text>
+  <text x="650" y="967" text-anchor="middle" font-size="25" font-weight="700" fill="#1a1a1a">alert when hg_raft_has_leader == 0 on every PD</text>
+</svg>

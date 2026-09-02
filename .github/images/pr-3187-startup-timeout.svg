@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 660" width="1300" height="660" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="1300" height="660" fill="#ffffff"/>
+
+  <!-- ===== Panel 1: today ===== -->
+  <text x="60" y="60" font-size="22" font-weight="bold" fill="#212121">Today: docker-entrypoint.sh runs  ./bin/start-hugegraph.sh -t 120  (literal)</text>
+
+  <text x="150" y="102" font-size="17" fill="#455a64">container start timer (-t 120)</text>
+  <rect x="150" y="110" width="276" height="26" fill="#c8e6c9" stroke="#2e7d32" stroke-width="1.5"/>
+  <line x1="426" y1="96" x2="426" y2="150" stroke="#c62828" stroke-width="3"/>
+  <text x="436" y="106" font-size="17" fill="#c62828" font-weight="bold">t = 120 s: exit 1, "Starting HugeGraphServer failed"</text>
+  <rect x="426" y="110" width="207" height="26" fill="none" stroke="#607d8b" stroke-width="1.5" stroke-dasharray="6,5"/>
+  <text x="440" y="128" font-size="16" fill="#607d8b">JVM still starting</text>
+
+  <text x="150" y="187" font-size="17" fill="#455a64">startup probe budget (failureThreshold 90 x periodSeconds 5 s)</text>
+  <rect x="150" y="195" width="1035" height="26" fill="#eceff1" stroke="#90a4ae" stroke-width="1.5"/>
+  <text x="415" y="213" font-size="17" fill="#455a64">450 s allowed, never consulted: the process is gone at 27% of the budget</text>
+
+  <line x1="150" y1="252" x2="1185" y2="252" stroke="#212121" stroke-width="1.5"/>
+  <line x1="150" y1="246" x2="150" y2="258" stroke="#212121" stroke-width="1.5"/>
+  <line x1="426" y1="246" x2="426" y2="258" stroke="#212121" stroke-width="1.5"/>
+  <line x1="1185" y1="246" x2="1185" y2="258" stroke="#212121" stroke-width="1.5"/>
+  <text x="150" y="280" font-size="16" fill="#212121" text-anchor="middle">0 s</text>
+  <text x="426" y="280" font-size="16" fill="#212121" text-anchor="middle">120 s</text>
+  <text x="1185" y="280" font-size="16" fill="#212121" text-anchor="middle">450 s</text>
+
+  <line x1="60" y1="320" x2="1240" y2="320" stroke="#cfd8dc" stroke-width="1.5"/>
+
+  <!-- ===== Panel 2: with this PR ===== -->
+  <text x="60" y="365" font-size="22" font-weight="bold" fill="#212121">With this PR: -t "${HG_SERVER_STARTUP_TIMEOUT_S:-120}"  (deployment sets 450; unset keeps 120)</text>
+
+  <text x="150" y="407" font-size="17" fill="#455a64">container start timer (HG_SERVER_STARTUP_TIMEOUT_S=450)</text>
+  <rect x="150" y="415" width="483" height="26" fill="#c8e6c9" stroke="#2e7d32" stroke-width="1.5"/>
+  <rect x="633" y="415" width="552" height="26" fill="#f1f8e9" stroke="#2e7d32" stroke-width="1.5" stroke-dasharray="6,5"/>
+  <text x="650" y="433" font-size="16" fill="#558b2f">budget remaining</text>
+  <line x1="633" y1="411" x2="633" y2="459" stroke="#2e7d32" stroke-width="3"/>
+  <text x="643" y="463" font-size="17" fill="#2e7d32" font-weight="bold">t ~ 210 s: server answers on the REST port</text>
+
+  <text x="150" y="492" font-size="17" fill="#455a64">startup probe budget (failureThreshold 90 x periodSeconds 5 s)</text>
+  <rect x="150" y="500" width="1035" height="26" fill="#eceff1" stroke="#90a4ae" stroke-width="1.5"/>
+  <line x1="633" y1="500" x2="633" y2="526" stroke="#2e7d32" stroke-width="3"/>
+  <text x="650" y="518" font-size="17" fill="#2e7d32">probe marks the pod Started</text>
+  <text x="720" y="492" font-size="17" fill="#455a64">the same 450 s sizes both timers, so they cannot disagree</text>
+
+  <line x1="150" y1="557" x2="1185" y2="557" stroke="#212121" stroke-width="1.5"/>
+  <line x1="150" y1="551" x2="150" y2="563" stroke="#212121" stroke-width="1.5"/>
+  <line x1="633" y1="551" x2="633" y2="563" stroke="#212121" stroke-width="1.5"/>
+  <line x1="1185" y1="551" x2="1185" y2="563" stroke="#212121" stroke-width="1.5"/>
+  <text x="150" y="585" font-size="16" fill="#212121" text-anchor="middle">0 s</text>
+  <text x="633" y="585" font-size="16" fill="#212121" text-anchor="middle">210 s</text>
+  <text x="1185" y="585" font-size="16" fill="#212121" text-anchor="middle">450 s</text>
+
+  <text x="60" y="632" font-size="16" fill="#607d8b">Times measured on the setup in #3186: 24 five-second polls, then exit 1. The -t timer starts after the storage wait; the probe budget covers the whole container.</text>
+</svg>

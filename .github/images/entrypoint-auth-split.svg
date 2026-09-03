@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 880" width="1300" height="880">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <polygon points="0,0 10,5 0,10" fill="#57606a"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1300" height="880" fill="#ffffff"/>
+
+  <text x="50" y="44" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="26" font-weight="bold" fill="#1f2328">One mounted authenticator, two different answers</text>
+  <text x="50" y="76" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#57606a">docker-entrypoint.sh on apache/hugegraph master 98477f0f5, with PASSWORD set and a conf/ that already selects an authenticator.</text>
+
+  <text x="50" y="118" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#1f2328">1   The mounted conf/, before startup</text>
+
+  <rect x="50" y="130" width="490" height="92" rx="6" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="70" y="162" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="bold" fill="#57606a">conf/rest-server.properties</text>
+  <text x="70" y="200" font-family="Menlo, DejaVu Sans Mono, Consolas, monospace" font-size="16" fill="#1f2328">auth.authenticator=...ConfigAuthenticator</text>
+
+  <rect x="570" y="130" width="680" height="92" rx="6" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="590" y="162" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="bold" fill="#57606a">conf/gremlin-server.yaml</text>
+  <text x="590" y="200" font-family="Menlo, DejaVu Sans Mono, Consolas, monospace" font-size="16" fill="#1f2328">authentication: {authenticator: ...ConfigAuthenticator}</text>
+
+  <line x1="295" y1="222" x2="295" y2="252" stroke="#57606a" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="910" y1="222" x2="910" y2="252" stroke="#57606a" stroke-width="2" marker-end="url(#ah)"/>
+
+  <rect x="50" y="256" width="1200" height="72" rx="6" fill="#ddf4ff" stroke="#54aeff" stroke-width="1.5"/>
+  <text x="650" y="288" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#1f2328">PASSWORD is set, so docker-entrypoint.sh runs bin/enable-auth.sh. The only thing that script checks is whether conf-bak/ exists,</text>
+  <text x="650" y="314" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#1f2328">so on a config it did not write, it appends its own definition to both files.</text>
+
+  <line x1="295" y1="328" x2="295" y2="358" stroke="#57606a" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="910" y1="328" x2="910" y2="358" stroke="#57606a" stroke-width="2" marker-end="url(#ah)"/>
+
+  <text x="50" y="388" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#1f2328">2   After enable-auth.sh, with the appended line in red</text>
+
+  <rect x="50" y="400" width="490" height="132" rx="6" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="70" y="432" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="bold" fill="#57606a">conf/rest-server.properties</text>
+  <text x="70" y="470" font-family="Menlo, DejaVu Sans Mono, Consolas, monospace" font-size="16" fill="#1f2328">auth.authenticator=...ConfigAuthenticator</text>
+  <rect x="62" y="486" width="466" height="32" rx="4" fill="#ffebe9" stroke="#ff8182" stroke-width="1"/>
+  <text x="70" y="508" font-family="Menlo, DejaVu Sans Mono, Consolas, monospace" font-size="16" fill="#cf222e">auth.authenticator=...StandardAuthenticator</text>
+
+  <rect x="570" y="400" width="680" height="132" rx="6" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.5"/>
+  <text x="590" y="432" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="bold" fill="#57606a">conf/gremlin-server.yaml</text>
+  <text x="590" y="470" font-family="Menlo, DejaVu Sans Mono, Consolas, monospace" font-size="16" fill="#1f2328">authentication: {authenticator: ...ConfigAuthenticator}</text>
+  <rect x="582" y="486" width="656" height="32" rx="4" fill="#ffebe9" stroke="#ff8182" stroke-width="1"/>
+  <text x="590" y="508" font-family="Menlo, DejaVu Sans Mono, Consolas, monospace" font-size="16" fill="#cf222e">authentication: {authenticator: ...StandardAuthenticator}</text>
+
+  <line x1="295" y1="532" x2="295" y2="562" stroke="#57606a" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="910" y1="532" x2="910" y2="562" stroke="#57606a" stroke-width="2" marker-end="url(#ah)"/>
+
+  <rect x="50" y="566" width="490" height="76" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="295" y="598" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#1f2328">commons-configuration2 2.8.0 turns the duplicate</text>
+  <text x="295" y="622" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#1f2328">key into a list, and getString returns the first.</text>
+
+  <rect x="570" y="566" width="680" height="76" rx="6" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="910" y="598" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#1f2328">snakeyaml 2.2 accepts the duplicate mapping key</text>
+  <text x="910" y="622" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#1f2328">and keeps the last one.</text>
+
+  <line x1="295" y1="642" x2="295" y2="672" stroke="#57606a" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="910" y1="642" x2="910" y2="672" stroke="#57606a" stroke-width="2" marker-end="url(#ah)"/>
+
+  <rect x="50" y="676" width="490" height="80" rx="6" fill="#fff8c5" stroke="#d4a72c" stroke-width="1.5"/>
+  <text x="295" y="712" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#1f2328">REST resolves to ConfigAuthenticator</text>
+  <text x="295" y="740" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#57606a">the authenticator that was mounted</text>
+
+  <rect x="570" y="676" width="680" height="80" rx="6" fill="#fff8c5" stroke="#d4a72c" stroke-width="1.5"/>
+  <text x="910" y="712" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#1f2328">Gremlin resolves to StandardAuthenticator</text>
+  <text x="910" y="740" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#57606a">the one enable-auth.sh appended</text>
+
+  <rect x="50" y="786" width="1200" height="64" rx="6" fill="#ffebe9" stroke="#cf222e" stroke-width="1.5"/>
+  <text x="650" y="824" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#82071e">Same two files, opposite winners: REST and Gremlin end up on different auth providers, and neither parser reports an error.</text>
+</svg>

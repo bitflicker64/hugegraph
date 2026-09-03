@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1340 700" width="1340" height="700">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5f6368"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1340" height="700" fill="#ffffff"/>
+
+  <text x="670" y="46" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="bold" fill="#1a1a1a">PD REST authentication, before and after this PR</text>
+
+  <line x1="670" y1="70" x2="670" y2="640" stroke="#dddddd" stroke-width="2"/>
+
+  <!-- ==================== LEFT: BEFORE ==================== -->
+  <text x="345" y="100" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#d93025">Before: only the service name is checked</text>
+
+  <!-- request box -->
+  <rect x="75" y="122" width="540" height="72" rx="8" fill="#f5f5f5" stroke="#999999" stroke-width="1.5"/>
+  <text x="345" y="152" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" fill="#1a1a1a">GET /v1/members</text>
+  <text x="345" y="178" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" fill="#1a1a1a">Authorization: Basic name:password</text>
+
+  <line x1="345" y1="194" x2="345" y2="232" stroke="#5f6368" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="360" y="219" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#5f6368">base64 decode</text>
+
+  <!-- keep name box -->
+  <rect x="75" y="236" width="540" height="52" rx="8" fill="#f5f5f5" stroke="#999999" stroke-width="1.5"/>
+  <text x="345" y="268" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#1a1a1a">keep the name, discard the password</text>
+
+  <line x1="345" y1="288" x2="345" y2="330" stroke="#5f6368" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="360" y="315" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#5f6368">name in {hg, store, hubble, vermeer}?</text>
+
+  <!-- outcome row -->
+  <rect x="75" y="334" width="255" height="92" rx="8" fill="#fdecea" stroke="#d93025" stroke-width="2"/>
+  <text x="202" y="362" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#1a1a1a">yes: 200 + data</text>
+  <text x="202" y="388" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="14" fill="#1a1a1a">hg: (empty pwd) passes</text>
+  <text x="202" y="410" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="14" fill="#1a1a1a">hg:wrongpwd passes</text>
+
+  <rect x="360" y="334" width="255" height="92" rx="8" fill="#fef7e0" stroke="#f9ab00" stroke-width="2"/>
+  <text x="487" y="368" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#1a1a1a">no: still 200</text>
+  <text x="487" y="398" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="14" fill="#1a1a1a">"invalid service name" in body</text>
+
+  <rect x="75" y="450" width="540" height="52" rx="8" fill="#fef7e0" stroke="#f9ab00" stroke-width="2"/>
+  <text x="345" y="482" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a1a1a">no Authorization header: 200, "Unauthorized!" in the body</text>
+
+  <text x="345" y="548" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#d93025">Every outcome is HTTP 200. The password is inert.</text>
+  <text x="345" y="576" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#5f6368">The four names are in the source, so anyone reaching port 8620 gets in.</text>
+
+  <!-- ==================== RIGHT: AFTER ==================== -->
+  <text x="995" y="100" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#188038">After: name and shared secret, refusals are 401</text>
+
+  <!-- request box -->
+  <rect x="725" y="122" width="540" height="72" rx="8" fill="#f5f5f5" stroke="#999999" stroke-width="1.5"/>
+  <text x="995" y="152" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" fill="#1a1a1a">GET /v1/members</text>
+  <text x="995" y="178" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="17" fill="#1a1a1a">Authorization: Basic name:password</text>
+
+  <line x1="995" y1="194" x2="995" y2="232" stroke="#5f6368" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="1010" y="219" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#5f6368">base64 decode</text>
+
+  <!-- check box -->
+  <rect x="725" y="236" width="540" height="76" rx="8" fill="#f5f5f5" stroke="#999999" stroke-width="1.5"/>
+  <text x="995" y="266" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#1a1a1a">name in {hg, store, hubble, vermeer}?</text>
+  <text x="995" y="294" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#1a1a1a">password matches auth.secret-key? (constant-time)</text>
+
+  <line x1="995" y1="312" x2="995" y2="330" stroke="#5f6368" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- outcome row -->
+  <rect x="725" y="334" width="255" height="92" rx="8" fill="#e6f4ea" stroke="#188038" stroke-width="2"/>
+  <text x="852" y="368" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#1a1a1a">both pass: 200 + data</text>
+  <text x="852" y="398" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" fill="#1a1a1a">only clients holding the secret</text>
+
+  <rect x="1010" y="334" width="255" height="92" rx="8" fill="#f1f3f4" stroke="#5f6368" stroke-width="2"/>
+  <text x="1137" y="362" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#1a1a1a">either fails: 401</text>
+  <text x="1137" y="388" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="14" fill="#1a1a1a">"invalid service name"</text>
+  <text x="1137" y="410" text-anchor="middle" font-family="Menlo, Consolas, monospace" font-size="14" fill="#1a1a1a">"invalid credential"</text>
+
+  <rect x="725" y="450" width="540" height="52" rx="8" fill="#f1f3f4" stroke="#5f6368" stroke-width="2"/>
+  <text x="995" y="482" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a1a1a">no Authorization header: 401</text>
+
+  <text x="995" y="548" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#188038">Refusals are visible: monitors fire, curl -f fails.</text>
+  <text x="995" y="576" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#5f6368">Probes stay open: /v1/health, /actuator/*, /v1/prom/targets/*</text>
+
+  <text x="670" y="636" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#5f6368">Interceptor covers /v1/** on port 8620, including members/change, store removal and balance tasks. Secret: auth.secret-key, env HG_PD_AUTH_SECRET_KEY.</text>
+</svg>

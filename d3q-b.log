@@ -1,0 +1,70 @@
+=== 2026-09-05T13:00:35+05:30 D3Q-B start (hd-b images, 10 s sampler timeout)
+--- oracle (declared before fault): survivor pd-0 /v1/ready -> 503 and hg_raft_has_leader 0 within the window; /v1/health stays 200 throughout; pd-0 Ready condition -> False; store-2 deleted inside the window stays Init until 2 PDs answer /v1/ready; schema create fails inside the window; full recovery (3 PD Ready, store-2 Running, /v1/ready 200 x3) within 600 s
+--- pre-fault state
+hd1-hugegraph-pd-0   8bba3f63-77d8-4207-8971-4fc1e19318cf   10.244.1.14   True
+hd1-hugegraph-pd-1   cc72a5c1-676a-4e57-bf27-17000f140eae   10.244.2.17   True
+hd1-hugegraph-pd-2   4785d70d-d464-40ea-8d48-ceecd52bb75f   10.244.3.16   True
+hd1-hugegraph-store-2   7a6df98c-dbf0-4a79-9b97-2174304a5f73   10.244.1.13
+--- T0=1788593447 2026-09-05T13:00:47+05:30 deleting pd-1 and pd-2
+pod "hd1-hugegraph-pd-1" deleted from hugegraph namespace
+pod "hd1-hugegraph-pd-2" deleted from hugegraph namespace
+--- T0+6: deleting store-2 (gate test)
+pod "hd1-hugegraph-store-2" deleted from hugegraph namespace
+T0+10s schema-create -> 400 {"exception":"class org.apache.hugegraph.exception.ExistedException","message":"The property key 'd3q_1' has existed","cause":"","trace":["org.apache.hugegraph.
+T0+14s schema-create -> 400 {"exception":"class org.apache.hugegraph.exception.ExistedException","message":"The property key 'd3q_2' has existed","cause":"","trace":["org.apache.hugegraph.
+T0+18s schema-create -> 400 {"exception":"class org.apache.hugegraph.exception.ExistedException","message":"The property key 'd3q_3' has existed","cause":"","trace":["org.apache.hugegraph.
+--- waiting for recovery (max 600 s)
+T0+18s pdReady=[True True True ] store2=Running/0/false
+T0+23s pdReady=[True True True ] store2=Running/0/false
+T0+28s pdReady=[True True True ] store2=Running/0/false
+T0+33s pdReady=[True True True ] store2=Running/0/false
+T0+38s pdReady=[True True True ] store2=Running/0/false
+T0+43s pdReady=[True True True ] store2=Running/0/false
+T0+48s pdReady=[True True True ] store2=Running/0/false
+T0+53s pdReady=[True True True ] store2=Running/0/false
+T0+58s pdReady=[True True True ] store2=Running/0/false
+T0+63s pdReady=[True True True ] store2=Running/0/false
+T0+68s pdReady=[True True True ] store2=Running/0/false
+T0+73s pdReady=[True True True ] store2=Running/0/false
+T0+78s pdReady=[True True True ] store2=Running/0/false
+T0+84s pdReady=[True True True ] store2=Running/0/false
+T0+89s pdReady=[True True True ] store2=Running/0/false
+T0+94s pdReady=[True True True ] store2=Running/0/false
+T0+99s pdReady=[True True True ] store2=Running/0/false
+T0+104s pdReady=[True True True ] store2=Running/0/false
+T0+109s pdReady=[True True True ] store2=Running/0/false
+T0+114s pdReady=[True True True ] store2=Running/0/false
+T0+119s pdReady=[True True True ] store2=Running/0/false
+T0+124s pdReady=[True True True ] store2=Running/0/false
+T0+129s pdReady=[True True True ] store2=Running/0/false
+T0+134s pdReady=[True True True ] store2=Running/0/false
+T0+139s pdReady=[True True True ] store2=Running/0/false
+T0+144s pdReady=[True True True ] store2=Running/0/false
+T0+149s pdReady=[True True True ] store2=Running/0/false
+T0+154s pdReady=[True True True ] store2=Running/0/false
+T0+159s pdReady=[True True True ] store2=Running/0/false
+T0+164s pdReady=[True True True ] store2=Running/0/false
+T0+170s pdReady=[True True True ] store2=Running/0/true
+--- post-recovery
+hd1-hugegraph-pd-0   8bba3f63-77d8-4207-8971-4fc1e19318cf   10.244.1.14   True   0
+hd1-hugegraph-pd-1   4ccce6ca-e59b-4d4d-b550-bf8b794f719d   10.244.2.20   True   0
+hd1-hugegraph-pd-2   90368e8c-c438-4502-a116-d6efbc0fdd99   10.244.3.19   True   0
+hd1-hugegraph-store-2   5d0bf826-fcf3-449b-ac25-a0e107447fdd   10.244.1.16   Running
+pd-0 ready=200 health=200
+pd-1 ready=200 health=200
+pd-2 ready=200 health=200
+--- store-2 init log
+Waiting for 2 PD peers to answer /v1/ready among: hd1-hugegraph-pd-0.hd1-hugegraph-pd.hugegraph.svc:8620 hd1-hugegraph-pd-1.hd1-hugegraph-pd.hugegraph.svc:8620 hd1-hugegraph-pd-2.hd1-hugegraph-pd.hugegraph.svc:8620
+Enough PD peers answered /v1/ready.
+--- pd-0 raft log lines
+--- blocked/unresolved after churn
+pd-0 unresolved=0 blocked=0
+pd-1 unresolved=0 blocked=0
+pd-2 unresolved=0 blocked=0
+--- post-recovery schema create -> 
+400
+--- sample summary
+samples=90 ready503=1 ready200=89 health200=90 healthNot200=0
+first503=1788593449.335970063 last503=1788593449.335970063 T0=1788593447 (offsets: 2.3 2.3)
+podReady=False samples: 0; has_leader=0 samples: 0
+=== 2026-09-05T13:03:51+05:30 D3Q-B end

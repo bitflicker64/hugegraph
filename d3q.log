@@ -1,0 +1,161 @@
+=== 2026-09-05T12:35:36+05:30 D3Q start
+--- oracle (declared before fault): survivor pd-0 /v1/ready -> 503 and hg_raft_has_leader 0 within the window; /v1/health stays 200 throughout; pd-0 Ready condition -> False; store-2 deleted inside the window stays Init until 2 PDs answer /v1/ready; schema create fails inside the window; full recovery (3 PD Ready, store-2 Running, /v1/ready 200 x3) within 600 s
+--- pre-fault state
+hd1-hugegraph-pd-0   a4c9793d-ec9c-44d1-b199-3d7b021f5eb4   10.244.1.6   True
+hd1-hugegraph-pd-1   aa87a2b6-0153-4a3b-bbd7-e1f2642f437f   10.244.2.6   True
+hd1-hugegraph-pd-2   0d805e95-f832-4ae5-8b55-28a5283224b6   10.244.3.7   True
+hd1-hugegraph-store-2   c63bb5ea-cfcf-4267-91de-6b00f1bca341   10.244.1.5
+--- T0=1788591947 2026-09-05T12:35:47+05:30 deleting pd-1 and pd-2
+pod "hd1-hugegraph-pd-1" deleted from hugegraph namespace
+pod "hd1-hugegraph-pd-2" deleted from hugegraph namespace
+--- T0+6: deleting store-2 (gate test)
+pod "hd1-hugegraph-store-2" deleted from hugegraph namespace
+T0+10s schema-create -> 000head: cannot open '/tmp/d3q-schema-1.json' for reading: No such file or directory
+ 
+T0+22s schema-create -> 000head: cannot open '/tmp/d3q-schema-2.json' for reading: No such file or directory
+ 
+T0+34s schema-create -> 202 {"property_key": {"id":4,"name":"d3q_3","data_type":"TEXT","cardinality":"SINGLE","aggregate_type":"NONE","write_type":"OLTP","properties":[],"status":"CREATED"
+--- waiting for recovery (max 600 s)
+T0+34s pdReady=[True True True ] store2=
+T0+39s pdReady=[True True True ] store2=
+T0+44s pdReady=[True True True ] store2=
+T0+49s pdReady=[True True True ] store2=
+T0+54s pdReady=[True True True ] store2=
+T0+59s pdReady=[True True True ] store2=
+T0+64s pdReady=[True True True ] store2=
+T0+69s pdReady=[True True True ] store2=
+T0+74s pdReady=[True True True ] store2=
+T0+80s pdReady=[True True True ] store2=
+T0+85s pdReady=[True True True ] store2=
+T0+90s pdReady=[True True True ] store2=
+T0+95s pdReady=[True True True ] store2=
+T0+100s pdReady=[True True True ] store2=
+T0+105s pdReady=[True True True ] store2=
+T0+110s pdReady=[True True True ] store2=
+T0+115s pdReady=[True True True ] store2=
+T0+120s pdReady=[True True True ] store2=
+T0+125s pdReady=[True True True ] store2=
+T0+130s pdReady=[True True True ] store2=
+T0+135s pdReady=[True True True ] store2=
+T0+140s pdReady=[True True True ] store2=
+T0+145s pdReady=[True True True ] store2=
+T0+150s pdReady=[True True True ] store2=
+T0+155s pdReady=[True True True ] store2=
+T0+161s pdReady=[True True True ] store2=
+T0+166s pdReady=[True True True ] store2=
+T0+171s pdReady=[True True True ] store2=
+T0+176s pdReady=[True True True ] store2=
+T0+181s pdReady=[True True True ] store2=
+T0+186s pdReady=[True True True ] store2=
+T0+191s pdReady=[True True True ] store2=
+T0+196s pdReady=[True True True ] store2=
+T0+201s pdReady=[True True True ] store2=
+T0+206s pdReady=[True True True ] store2=
+T0+211s pdReady=[True True True ] store2=
+T0+216s pdReady=[True True True ] store2=
+T0+221s pdReady=[True True True ] store2=
+T0+226s pdReady=[True True True ] store2=
+T0+231s pdReady=[True True True ] store2=
+T0+236s pdReady=[True True True ] store2=
+T0+241s pdReady=[True True True ] store2=
+T0+247s pdReady=[True True True ] store2=
+T0+252s pdReady=[True True True ] store2=
+T0+257s pdReady=[True True True ] store2=
+T0+262s pdReady=[True True True ] store2=
+T0+267s pdReady=[True True True ] store2=
+T0+272s pdReady=[True True True ] store2=
+T0+277s pdReady=[True True True ] store2=
+T0+282s pdReady=[True True True ] store2=
+T0+287s pdReady=[True True True ] store2=
+T0+292s pdReady=[True True True ] store2=
+T0+297s pdReady=[True True True ] store2=
+T0+302s pdReady=[True True True ] store2=
+T0+307s pdReady=[True True True ] store2=
+T0+312s pdReady=[True True True ] store2=
+T0+317s pdReady=[True True True ] store2=
+T0+322s pdReady=[True True True ] store2=
+T0+328s pdReady=[True True True ] store2=
+T0+333s pdReady=[True True True ] store2=
+T0+338s pdReady=[True True True ] store2=
+T0+343s pdReady=[True True True ] store2=
+T0+348s pdReady=[True True True ] store2=
+T0+353s pdReady=[True True True ] store2=
+T0+358s pdReady=[True True True ] store2=
+T0+363s pdReady=[True True True ] store2=
+T0+368s pdReady=[True True True ] store2=
+T0+373s pdReady=[True True True ] store2=
+T0+378s pdReady=[True True True ] store2=
+T0+383s pdReady=[True True True ] store2=
+T0+388s pdReady=[True True True ] store2=
+T0+393s pdReady=[True True True ] store2=
+T0+398s pdReady=[True True True ] store2=
+T0+403s pdReady=[True True True ] store2=
+T0+408s pdReady=[True True True ] store2=
+T0+414s pdReady=[True True True ] store2=
+T0+419s pdReady=[True True True ] store2=
+T0+424s pdReady=[True True True ] store2=
+T0+429s pdReady=[True True True ] store2=
+T0+434s pdReady=[True True True ] store2=
+T0+439s pdReady=[True True True ] store2=
+T0+444s pdReady=[True True True ] store2=
+T0+449s pdReady=[True True True ] store2=
+T0+454s pdReady=[True True True ] store2=
+T0+459s pdReady=[True True True ] store2=
+T0+464s pdReady=[True True True ] store2=
+T0+469s pdReady=[True True True ] store2=
+T0+474s pdReady=[True True True ] store2=
+T0+479s pdReady=[True True True ] store2=
+T0+484s pdReady=[True True True ] store2=
+T0+489s pdReady=[True True True ] store2=
+T0+495s pdReady=[True True True ] store2=
+T0+500s pdReady=[True True True ] store2=
+T0+505s pdReady=[True True True ] store2=
+T0+510s pdReady=[True True True ] store2=
+T0+515s pdReady=[True True True ] store2=
+T0+520s pdReady=[True True True ] store2=
+T0+525s pdReady=[True True True ] store2=
+T0+530s pdReady=[True True True ] store2=
+T0+535s pdReady=[True True True ] store2=
+T0+540s pdReady=[True True True ] store2=
+T0+545s pdReady=[True True True ] store2=
+T0+550s pdReady=[True True True ] store2=
+T0+555s pdReady=[True True True ] store2=
+T0+560s pdReady=[True True True ] store2=
+T0+565s pdReady=[True True True ] store2=
+T0+570s pdReady=[True True True ] store2=
+T0+576s pdReady=[True True True ] store2=
+T0+581s pdReady=[True True True ] store2=
+T0+586s pdReady=[True True True ] store2=
+T0+591s pdReady=[True True True ] store2=
+T0+596s pdReady=[True True True ] store2=
+T0+601s pdReady=[True True True ] store2=
+T0+606s pdReady=[True True True ] store2=
+T0+611s pdReady=[True True True ] store2=
+T0+616s pdReady=[True True True ] store2=
+T0+621s pdReady=[True True True ] store2=
+T0+626s pdReady=[True True True ] store2=
+T0+631s pdReady=[True True True ] store2=
+T0+636s pdReady=[True True True ] store2=
+--- post-recovery
+hd1-hugegraph-pd-0   a4c9793d-ec9c-44d1-b199-3d7b021f5eb4   10.244.1.6   True   0
+hd1-hugegraph-pd-1   d1ca9d0e-6532-4962-99cd-b588144ac669   10.244.2.8   True   0
+hd1-hugegraph-pd-2   b46e68aa-866a-4803-a784-bc2e305d92fe   10.244.3.9   True   0
+hd1-hugegraph-store-2   b8c457b5-e4ce-4af3-a5b8-3b4183fbeefb   10.244.1.7   Running
+pd-0 ready=200 health=200
+pd-1 ready=200 health=200
+pd-2 ready=200 health=200
+--- store-2 init log
+Waiting for 2 PD peers to answer /v1/ready among: hd1-hugegraph-pd-0.hd1-hugegraph-pd.hugegraph.svc:8620 hd1-hugegraph-pd-1.hd1-hugegraph-pd.hugegraph.svc:8620 hd1-hugegraph-pd-2.hd1-hugegraph-pd.hugegraph.svc:8620
+Enough PD peers answered /v1/ready.
+--- pd-0 raft log lines
+--- blocked/unresolved after churn
+pd-0 unresolved=0 blocked=0
+pd-1 unresolved=0 blocked=0
+pd-2 unresolved=0 blocked=0
+--- post-recovery schema create -> 
+202
+--- sample summary
+samples=313 ready503=1 ready200=309 health200=313 healthNot200=0
+first503=1788591949.585468877 last503=1788591949.585468877 T0=1788591947 (offsets: 2.6 2.6)
+podReady=False samples: 0; has_leader=0 samples: 0
+=== 2026-09-05T12:46:33+05:30 D3Q end

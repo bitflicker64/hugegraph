@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 860" width="1300" height="860" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="1300" height="860" fill="#ffffff"/>
+
+  <!-- title -->
+  <text x="40" y="46" font-size="26" font-weight="bold" fill="#1f2328">A race between two timers: HugeGraph Server exits 1 on a cold cluster</text>
+  <text x="40" y="74" font-size="18" fill="#57606a">apache/hugegraph issue 3203. Times from one reproduction, Server container start = T+0.</text>
+
+  <!-- key band -->
+  <rect x="40" y="92" width="1220" height="104" rx="6" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="40" y="92" width="4" height="104" fill="#8c959f"/>
+  <text x="62" y="118" font-size="18" font-weight="bold" fill="#7d4e00">FIXED by the code</text>
+  <text x="62" y="142" font-size="18" fill="#1f2328">First partition request at T+42 s, then 10 retries with</text>
+  <text x="62" y="164" font-size="18" fill="#1f2328">backoff 1, 1, 1, 2, 3, 4, 5, 6, 7, 8 s = 38 s of patience.</text>
+  <text x="680" y="118" font-size="18" font-weight="bold" fill="#0a3069">VARIABLE on the cluster</text>
+  <text x="680" y="142" font-size="18" fill="#1f2328">When the Stores finish registering with PD. Nothing orders</text>
+  <text x="680" y="164" font-size="18" fill="#1f2328">pod start: PD up 10 to 16 s, Stores 11 to 17 s, after the Server.</text>
+  <text x="62" y="188" font-size="18" fill="#57606a">While Stores are missing, PD answers: error code = 105, msg = The number of active stores is less then 3</text>
+
+  <!-- gridlines -->
+  <g stroke="#eaeef2" stroke-width="1">
+    <line x1="250" y1="216" x2="250" y2="756"/>
+    <line x1="422" y1="216" x2="422" y2="756"/>
+    <line x1="594" y1="216" x2="594" y2="756"/>
+    <line x1="766" y1="216" x2="766" y2="756"/>
+    <line x1="938" y1="216" x2="938" y2="756"/>
+    <line x1="1110" y1="216" x2="1110" y2="756"/>
+  </g>
+
+  <!-- ============ PANEL A: success ============ -->
+  <rect x="40" y="222" width="4" height="224" fill="#1a7f37"/>
+  <text x="60" y="248" font-size="20" font-weight="bold" fill="#1f2328">Case A: the Stores register at T+64 s, inside the window</text>
+  <rect x="1010" y="222" width="240" height="34" rx="17" fill="#d3f4dc" stroke="#1a7f37"/>
+  <text x="1130" y="245" font-size="18" font-weight="bold" fill="#0f5323" text-anchor="middle">Server starts normally</text>
+
+  <text x="611" y="276" font-size="18" fill="#57606a" text-anchor="middle">T+42 s: first partition request</text>
+  <text x="806" y="276" font-size="18" fill="#0f5323">T+64 s: the next retry succeeds</text>
+
+  <!-- lane labels -->
+  <text x="238" y="315" font-size="18" font-weight="bold" fill="#1f2328" text-anchor="end">Server</text>
+  <text x="238" y="376" font-size="18" font-weight="bold" fill="#1f2328" text-anchor="end">Stores</text>
+
+  <!-- server lane -->
+  <rect x="250" y="286" width="361" height="46" fill="#eaeef2" stroke="#afb8c1"/>
+  <text x="430" y="315" font-size="18" fill="#24292f" text-anchor="middle">JVM boot, 42 s</text>
+  <rect x="611" y="286" width="327" height="46" fill="#fdf0cd" stroke="#bf8700"/>
+  <text x="700" y="316" font-size="18" font-weight="bold" fill="#7d4e00" text-anchor="middle">retry window, 38 s</text>
+
+  <!-- stores lane -->
+  <text x="364" y="376" font-size="18" fill="#57606a" text-anchor="end">pods start</text>
+  <rect x="370" y="354" width="430" height="32" fill="#ddf4ff" stroke="#218bff"/>
+  <text x="585" y="376" font-size="18" fill="#0a3069" text-anchor="middle">Stores starting and registering with PD</text>
+  <polygon points="800,341 813,354 800,367 787,354" fill="#d3f4dc" stroke="#1a7f37" stroke-width="2"/>
+
+  <!-- comparison verticals -->
+  <line x1="938" y1="286" x2="938" y2="402" stroke="#bf8700" stroke-width="2" stroke-dasharray="6 4"/>
+  <line x1="800" y1="286" x2="800" y2="402" stroke="#1a7f37" stroke-width="2" stroke-dasharray="6 4"/>
+  <rect x="814" y="360" width="176" height="22" fill="#ffffff"/>
+  <text x="818" y="376" font-size="18" font-weight="bold" fill="#0f5323">registered, T+64 s</text>
+  <!-- slack arrow -->
+  <line x1="806" y1="402" x2="932" y2="402" stroke="#1a7f37" stroke-width="2"/>
+  <polygon points="800,402 812,397 812,407" fill="#1a7f37"/>
+  <polygon points="938,402 926,397 926,407" fill="#1a7f37"/>
+  <text x="869" y="424" font-size="18" font-weight="bold" fill="#0f5323" text-anchor="middle">16 s to spare</text>
+
+  <line x1="40" y1="466" x2="1260" y2="466" stroke="#d0d7de"/>
+
+  <!-- ============ PANEL B: failure ============ -->
+  <rect x="40" y="488" width="4" height="224" fill="#cf222e"/>
+  <text x="60" y="514" font-size="20" font-weight="bold" fill="#1f2328">Case B: the Stores register at T+95 s, after the window closed</text>
+  <rect x="1010" y="488" width="240" height="34" rx="17" fill="#ffe3e0" stroke="#cf222e"/>
+  <text x="1130" y="511" font-size="18" font-weight="bold" fill="#8b1a1a" text-anchor="middle">Server exits 1 at T+85 s</text>
+
+  <text x="611" y="542" font-size="18" fill="#57606a" text-anchor="middle">T+42 s: first partition request</text>
+  <text x="944" y="542" font-size="18" font-weight="bold" fill="#8b1a1a">T+80 s: retry limit of 10 reached</text>
+
+  <!-- lane labels -->
+  <text x="238" y="581" font-size="18" font-weight="bold" fill="#1f2328" text-anchor="end">Server</text>
+  <text x="238" y="642" font-size="18" font-weight="bold" fill="#1f2328" text-anchor="end">Stores</text>
+
+  <!-- server lane -->
+  <rect x="250" y="552" width="361" height="46" fill="#eaeef2" stroke="#afb8c1"/>
+  <text x="430" y="581" font-size="18" fill="#24292f" text-anchor="middle">JVM boot, 42 s</text>
+  <rect x="611" y="552" width="327" height="46" fill="#fdf0cd" stroke="#bf8700"/>
+  <text x="700" y="582" font-size="18" font-weight="bold" fill="#7d4e00" text-anchor="middle">retry window, 38 s</text>
+  <rect x="938" y="552" width="43" height="46" fill="#ffe3e0" stroke="#cf222e"/>
+  <line x1="948" y1="562" x2="971" y2="588" stroke="#cf222e" stroke-width="3"/>
+  <line x1="971" y1="562" x2="948" y2="588" stroke="#cf222e" stroke-width="3"/>
+
+  <!-- stores lane -->
+  <text x="364" y="642" font-size="18" fill="#57606a" text-anchor="end">pods start</text>
+  <rect x="370" y="620" width="697" height="32" fill="#ddf4ff" stroke="#218bff"/>
+  <text x="718" y="642" font-size="18" fill="#0a3069" text-anchor="middle">Stores starting and registering with PD</text>
+  <polygon points="1067,607 1080,620 1067,633 1054,620" fill="#ffe3e0" stroke="#cf222e" stroke-width="2"/>
+  <text x="1085" y="642" font-size="18" font-weight="bold" fill="#8b1a1a">registered, T+95 s</text>
+
+  <!-- comparison verticals -->
+  <line x1="938" y1="552" x2="938" y2="668" stroke="#bf8700" stroke-width="2" stroke-dasharray="6 4"/>
+  <line x1="1067" y1="552" x2="1067" y2="668" stroke="#cf222e" stroke-width="2" stroke-dasharray="6 4"/>
+  <!-- overshoot arrow -->
+  <line x1="944" y1="668" x2="1061" y2="668" stroke="#cf222e" stroke-width="2"/>
+  <polygon points="938,668 950,663 950,673" fill="#cf222e"/>
+  <polygon points="1067,668 1055,663 1055,673" fill="#cf222e"/>
+  <text x="1002" y="690" font-size="18" font-weight="bold" fill="#8b1a1a" text-anchor="middle">15 s too late</text>
+
+  <!-- ============ shared time axis ============ -->
+  <line x1="250" y1="756" x2="1210" y2="756" stroke="#8c959f" stroke-width="2"/>
+  <polygon points="1218,756 1206,751 1206,761" fill="#8c959f"/>
+  <g stroke="#8c959f" stroke-width="2">
+    <line x1="250" y1="756" x2="250" y2="764"/>
+    <line x1="422" y1="756" x2="422" y2="764"/>
+    <line x1="594" y1="756" x2="594" y2="764"/>
+    <line x1="766" y1="756" x2="766" y2="764"/>
+    <line x1="938" y1="756" x2="938" y2="764"/>
+    <line x1="1110" y1="756" x2="1110" y2="764"/>
+  </g>
+  <g font-size="18" fill="#57606a" text-anchor="middle">
+    <text x="250" y="784">T+0 s</text>
+    <text x="422" y="784">20</text>
+    <text x="594" y="784">40</text>
+    <text x="766" y="784">60</text>
+    <text x="938" y="784">80</text>
+    <text x="1110" y="784">100</text>
+  </g>
+  <text x="238" y="762" font-size="18" fill="#57606a" text-anchor="end">seconds</text>
+
+  <!-- footer -->
+  <text x="40" y="818" font-size="18" fill="#57606a">Ceiling is compiled in: NODE_MAX_RETRYING_TIMES = 10 (HgStoreClientConst.java:48), read only at NodeTxExecutor.java:376 and :383.</text>
+  <text x="40" y="842" font-size="18" fill="#57606a">Throw site: HgStoreNodePartitionerImpl.java:87. Replacing a Server pod in a running cluster never reproduced this: 66 attempts, 0 failures.</text>
+</svg>

@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 620" width="1300" height="620" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#444444"/>
+    </marker>
+    <marker id="ahred" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#B03A2E"/>
+    </marker>
+    <marker id="ahteal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0E6E63"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1300" height="620" fill="#FFFFFF"/>
+  <line x1="650" y1="24" x2="650" y2="596" stroke="#CCCCCC" stroke-width="1.5"/>
+
+  <!-- ==================== LEFT: TODAY ==================== -->
+  <text x="40" y="52" font-size="24" font-weight="bold" fill="#1A1A1A">Today (hstore + PD)</text>
+
+  <!-- Server A -->
+  <rect x="40" y="84" width="170" height="58" rx="8" fill="#F2F2F0" stroke="#555555" stroke-width="1.5"/>
+  <text x="125" y="110" font-size="19" font-weight="bold" fill="#1A1A1A" text-anchor="middle">Server A</text>
+  <text x="125" y="132" font-size="15" fill="#555555" text-anchor="middle">schema DDL</text>
+
+  <!-- CLEAR key -->
+  <rect x="330" y="84" width="280" height="58" rx="8" fill="#FFFFFF" stroke="#555555" stroke-width="1.5"/>
+  <text x="470" y="110" font-size="17" font-weight="bold" fill="#1A1A1A" text-anchor="middle">PD key EVENT/&#8230;/CLEAR</text>
+  <text x="470" y="132" font-size="15" fill="#555555" text-anchor="middle">one event per operation</text>
+
+  <!-- A -> CLEAR -->
+  <line x1="210" y1="113" x2="326" y2="113" stroke="#444444" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="268" y="78" font-size="15" fill="#333333" text-anchor="middle">add / remove only</text>
+
+  <!-- Servers B and C -->
+  <rect x="330" y="210" width="120" height="52" rx="8" fill="#F2F2F0" stroke="#555555" stroke-width="1.5"/>
+  <text x="390" y="241" font-size="18" font-weight="bold" fill="#1A1A1A" text-anchor="middle">Server B</text>
+  <rect x="490" y="210" width="120" height="52" rx="8" fill="#F2F2F0" stroke="#555555" stroke-width="1.5"/>
+  <text x="550" y="241" font-size="18" font-weight="bold" fill="#1A1A1A" text-anchor="middle">Server C</text>
+
+  <!-- CLEAR -> B, C -->
+  <line x1="430" y1="142" x2="394" y2="206" stroke="#444444" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="510" y1="142" x2="546" y2="206" stroke="#444444" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="470" y="186" font-size="15" fill="#333333" text-anchor="middle">FULL cache clear, every event</text>
+
+  <!-- update path: silence -->
+  <line x1="125" y1="142" x2="125" y2="316" stroke="#B03A2E" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#ahred)"/>
+  <text x="138" y="298" font-size="15" fill="#B03A2E">update / status flip</text>
+
+  <rect x="40" y="320" width="570" height="88" rx="8" fill="#FDF3F1" stroke="#B03A2E" stroke-width="1.5"/>
+  <text x="58" y="349" font-size="17" font-weight="bold" fill="#B03A2E">No event is sent at all.</text>
+  <text x="58" y="373" font-size="15" fill="#7A2C22">Servers B and C keep the old schema indefinitely: a changed index,</text>
+  <text x="58" y="394" font-size="15" fill="#7A2C22">a wiped one still marked usable, a removed label still planned against.</text>
+
+  <rect x="40" y="440" width="570" height="120" rx="8" fill="#F7F7F5" stroke="#BBBBBB" stroke-width="1"/>
+  <text x="58" y="470" font-size="16" font-weight="bold" fill="#333333">Why updates were silenced: the storm</text>
+  <text x="58" y="496" font-size="15" fill="#444444">Broadcasting them per op: 1,000 status flips &#215; 10 servers</text>
+  <text x="58" y="518" font-size="15" fill="#444444">= 10,000 full clears and ~40,000 reload scans in one minute.</text>
+  <text x="58" y="540" font-size="15" fill="#444444">Cluster work grows with every mutation: O(M &#215; N).</text>
+
+  <!-- ==================== RIGHT: PROPOSED ==================== -->
+  <text x="690" y="52" font-size="24" font-weight="bold" fill="#1A1A1A">Proposed: register + hints + reconciler</text>
+
+  <!-- Server A -->
+  <rect x="690" y="84" width="170" height="58" rx="8" fill="#F2F2F0" stroke="#555555" stroke-width="1.5"/>
+  <text x="775" y="110" font-size="19" font-weight="bold" fill="#1A1A1A" text-anchor="middle">Server A</text>
+  <text x="775" y="132" font-size="15" fill="#555555" text-anchor="middle">any schema mutation</text>
+
+  <!-- Version register -->
+  <rect x="990" y="84" width="280" height="58" rx="8" fill="#E9F3F1" stroke="#0E6E63" stroke-width="2"/>
+  <text x="1130" y="110" font-size="17" font-weight="bold" fill="#0A544C" text-anchor="middle">version register (PD KV)</text>
+  <text x="1130" y="132" font-size="15" fill="#0A544C" text-anchor="middle">SCHEMA_VERSION/{graph}</text>
+
+  <!-- A -> register -->
+  <line x1="860" y1="113" x2="986" y2="113" stroke="#0E6E63" stroke-width="2.5" marker-end="url(#ahteal)"/>
+  <text x="922" y="78" font-size="15" fill="#0A544C" text-anchor="middle">1 put per mutation, zero fan-out</text>
+
+  <!-- DELTA key -->
+  <rect x="990" y="208" width="280" height="58" rx="8" fill="#FFFFFF" stroke="#555555" stroke-width="1.5"/>
+  <text x="1130" y="234" font-size="17" font-weight="bold" fill="#1A1A1A" text-anchor="middle">PD key EVENT/&#8230;/DELTA</text>
+  <text x="1130" y="256" font-size="15" fill="#555555" text-anchor="middle">coalesced hints, &#8804; 2/s per graph</text>
+
+  <!-- A -> DELTA -->
+  <line x1="808" y1="142" x2="1002" y2="212" stroke="#444444" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="878" y="196" font-size="15" fill="#333333" text-anchor="middle">{type, id} hints,</text>
+  <text x="878" y="216" font-size="15" fill="#333333" text-anchor="middle">500 ms window</text>
+
+  <!-- Servers B and C -->
+  <rect x="690" y="330" width="150" height="52" rx="8" fill="#F2F2F0" stroke="#555555" stroke-width="1.5"/>
+  <text x="765" y="361" font-size="18" font-weight="bold" fill="#1A1A1A" text-anchor="middle">Server B</text>
+  <rect x="880" y="330" width="150" height="52" rx="8" fill="#F2F2F0" stroke="#555555" stroke-width="1.5"/>
+  <text x="955" y="361" font-size="18" font-weight="bold" fill="#1A1A1A" text-anchor="middle">Server C</text>
+
+  <!-- DELTA -> B, C -->
+  <line x1="1050" y1="266" x2="790" y2="326" stroke="#444444" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="1090" y1="266" x2="965" y2="326" stroke="#444444" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="880" y="304" font-size="15" fill="#333333" text-anchor="middle">invalidate those ids only</text>
+
+  <!-- B -> register poll -->
+  <path d="M 1030 352 C 1230 348, 1252 238, 1232 146" fill="none" stroke="#0E6E63" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#ahteal)"/>
+  <text x="1000" y="402" font-size="15" fill="#0A544C" text-anchor="middle">reconciler polls the register every 10 s:</text>
+  <text x="1000" y="422" font-size="15" fill="#0A544C" text-anchor="middle">mismatch &#8658; clear + resync</text>
+
+  <rect x="690" y="440" width="580" height="120" rx="8" fill="#E9F3F1" stroke="#0E6E63" stroke-width="1.5"/>
+  <text x="708" y="470" font-size="16" font-weight="bold" fill="#0A544C">Hints wake nodes up; only the register is the truth.</text>
+  <text x="708" y="496" font-size="15" fill="#0A544C">Lose every event and staleness is still bounded: &#8804; 2 &#215; interval (20 s).</text>
+  <text x="708" y="518" font-size="15" fill="#0A544C">Same 1,000-flip storm: &#8804; 121 events, ~40 clears cluster-wide (~250&#215; less),</text>
+  <text x="708" y="540" font-size="15" fill="#0A544C">independent of M. Schema read hit paths gain zero instructions.</text>
+</svg>

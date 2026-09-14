@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 580" width="1300" height="580" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="wah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#444444"/>
+    </marker>
+    <marker id="wahteal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0E6E63"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1300" height="580" fill="#FFFFFF"/>
+  <text x="40" y="48" font-size="24" font-weight="bold" fill="#1A1A1A">Rolling upgrade: who publishes and watches which key</text>
+
+  <text x="130" y="96" font-size="17" font-weight="bold" fill="#555555">publishers</text>
+  <text x="595" y="96" font-size="17" font-weight="bold" fill="#555555">PD event keys</text>
+  <text x="1050" y="96" font-size="17" font-weight="bold" fill="#555555">subscribers</text>
+
+  <!-- publishers -->
+  <rect x="40" y="120" width="260" height="64" rx="8" fill="#E9F3F1" stroke="#0E6E63" stroke-width="2"/>
+  <text x="170" y="147" font-size="18" font-weight="bold" fill="#0A544C" text-anchor="middle">upgraded server</text>
+  <text x="170" y="170" font-size="15" fill="#0A544C" text-anchor="middle">coalesced flusher</text>
+
+  <rect x="40" y="380" width="260" height="64" rx="8" fill="#F2F2F0" stroke="#555555" stroke-width="1.5"/>
+  <text x="170" y="407" font-size="18" font-weight="bold" fill="#1A1A1A" text-anchor="middle">old server</text>
+  <text x="170" y="430" font-size="15" fill="#555555" text-anchor="middle">unchanged code</text>
+
+  <!-- keys -->
+  <rect x="490" y="120" width="320" height="64" rx="8" fill="#E9F3F1" stroke="#0E6E63" stroke-width="2"/>
+  <text x="650" y="147" font-size="18" font-weight="bold" fill="#0A544C" text-anchor="middle">DELTA key (new)</text>
+  <text x="650" y="170" font-size="15" fill="#0A544C" text-anchor="middle">per-id hints, every flush window</text>
+
+  <rect x="490" y="300" width="320" height="64" rx="8" fill="#FFFFFF" stroke="#555555" stroke-width="1.5"/>
+  <text x="650" y="327" font-size="18" font-weight="bold" fill="#1A1A1A" text-anchor="middle">CLEAR key (legacy)</text>
+  <text x="650" y="350" font-size="15" fill="#555555" text-anchor="middle">payload byte-identical to today</text>
+
+  <!-- subscribers -->
+  <rect x="960" y="110" width="300" height="58" rx="8" fill="#E9F3F1" stroke="#0E6E63" stroke-width="2"/>
+  <text x="1110" y="136" font-size="18" font-weight="bold" fill="#0A544C" text-anchor="middle">upgraded server</text>
+  <text x="1110" y="158" font-size="15" fill="#0A544C" text-anchor="middle">watches both keys</text>
+
+  <rect x="960" y="290" width="300" height="58" rx="8" fill="#F2F2F0" stroke="#555555" stroke-width="1.5"/>
+  <text x="1110" y="316" font-size="18" font-weight="bold" fill="#1A1A1A" text-anchor="middle">old server</text>
+  <text x="1110" y="338" font-size="15" fill="#555555" text-anchor="middle">watches CLEAR only</text>
+
+  <rect x="960" y="410" width="300" height="58" rx="8" fill="#F2F2F0" stroke="#555555" stroke-width="1.5"/>
+  <text x="1110" y="436" font-size="18" font-weight="bold" fill="#1A1A1A" text-anchor="middle">store node</text>
+  <text x="1110" y="458" font-size="15" fill="#555555" text-anchor="middle">watches CLEAR only</text>
+
+  <!-- publisher -> key arrows -->
+  <line x1="300" y1="150" x2="486" y2="150" stroke="#0E6E63" stroke-width="2.5" marker-end="url(#wahteal)"/>
+  <text x="393" y="136" font-size="15" fill="#0A544C" text-anchor="middle">every coalesced flush</text>
+
+  <line x1="300" y1="176" x2="486" y2="316" stroke="#444444" stroke-width="2" marker-end="url(#wah)"/>
+  <text x="352" y="262" font-size="15" fill="#333333" text-anchor="middle">only bursts containing</text>
+  <text x="352" y="282" font-size="15" fill="#333333" text-anchor="middle">add / remove / clear,</text>
+  <text x="352" y="302" font-size="15" fill="#333333" text-anchor="middle">one per window</text>
+
+  <line x1="300" y1="404" x2="486" y2="346" stroke="#444444" stroke-width="2" marker-end="url(#wah)"/>
+  <text x="390" y="398" font-size="15" fill="#333333" text-anchor="middle">today's per-op events,</text>
+  <text x="390" y="418" font-size="15" fill="#333333" text-anchor="middle">unchanged</text>
+
+  <!-- key -> subscriber arrows -->
+  <line x1="810" y1="142" x2="956" y2="136" stroke="#0E6E63" stroke-width="2.5" marker-end="url(#wahteal)"/>
+  <text x="884" y="122" font-size="15" fill="#0A544C" text-anchor="middle">invalidate ids only</text>
+
+  <line x1="810" y1="316" x2="956" y2="162" stroke="#444444" stroke-width="2" marker-end="url(#wah)"/>
+  <text x="912" y="230" font-size="15" fill="#333333" text-anchor="middle">applied as a</text>
+  <text x="912" y="250" font-size="15" fill="#333333" text-anchor="middle">full-clear hint</text>
+
+  <line x1="810" y1="330" x2="956" y2="322" stroke="#444444" stroke-width="2" marker-end="url(#wah)"/>
+  <text x="884" y="308" font-size="15" fill="#333333" text-anchor="middle">full clear, as today</text>
+
+  <line x1="810" y1="348" x2="956" y2="432" stroke="#444444" stroke-width="2" marker-end="url(#wah)"/>
+  <text x="866" y="404" font-size="15" fill="#333333" text-anchor="middle">as today, once the</text>
+  <text x="866" y="424" font-size="15" fill="#333333" text-anchor="middle">parser fix ships</text>
+
+  <!-- invisibility note -->
+  <text x="650" y="212" font-size="15" fill="#888888" text-anchor="middle">old servers and store nodes never see this key:</text>
+  <text x="650" y="232" font-size="15" fill="#888888" text-anchor="middle">all existing watches are exact-key</text>
+
+  <rect x="40" y="500" width="1220" height="52" rx="8" fill="#F7F7F5" stroke="#BBBBBB" stroke-width="1"/>
+  <text x="58" y="522" font-size="15" fill="#333333">Any pod order is safe. An old subscriber during an upgraded publisher's bulk DDL sees strictly fewer events than today; update-only bursts send it nothing,</text>
+  <text x="58" y="542" font-size="15" fill="#333333">exactly as today. Coverage improves as each pod upgrades and is never worse mid-roll than the status quo.</text>
+</svg>

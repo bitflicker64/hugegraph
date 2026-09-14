@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 560" width="1300" height="560" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="tah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#444444"/>
+    </marker>
+    <pattern id="hintticks" x="0" y="0" width="6" height="22" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="6" height="22" fill="#FFFFFF"/>
+      <rect x="2" y="0" width="1.6" height="22" fill="#555555"/>
+    </pattern>
+  </defs>
+
+  <rect x="0" y="0" width="1300" height="560" fill="#FFFFFF"/>
+  <text x="40" y="48" font-size="24" font-weight="bold" fill="#1A1A1A">One worst-case burst: 1,000 status flips in 60 s, 10 servers</text>
+
+  <!-- time axis -->
+  <line x1="110" y1="470" x2="1150" y2="470" stroke="#444444" stroke-width="2" marker-end="url(#tah)"/>
+  <text x="1162" y="475" font-size="15" fill="#333333">time</text>
+  <g font-size="14" fill="#555555" text-anchor="middle">
+    <line x1="110" y1="470" x2="110" y2="478" stroke="#555555" stroke-width="1.5"/><text x="110" y="496">0 s</text>
+    <line x1="350" y1="470" x2="350" y2="478" stroke="#555555" stroke-width="1.5"/><text x="350" y="496">20 s</text>
+    <line x1="590" y1="470" x2="590" y2="478" stroke="#555555" stroke-width="1.5"/><text x="590" y="496">40 s</text>
+    <line x1="830" y1="470" x2="830" y2="478" stroke="#555555" stroke-width="1.5"/><text x="830" y="496">60 s (burst ends)</text>
+    <line x1="1070" y1="470" x2="1070" y2="478" stroke="#555555" stroke-width="1.5"/><text x="1070" y="496">80 s</text>
+  </g>
+
+  <!-- burst extent guide -->
+  <line x1="830" y1="86" x2="830" y2="470" stroke="#BBBBBB" stroke-width="1" stroke-dasharray="4 5"/>
+
+  <!-- lane 1: mutations -->
+  <text x="110" y="88" font-size="16" font-weight="bold" fill="#1A1A1A">mutations</text>
+  <rect x="110" y="96" width="720" height="24" fill="#3D3D3D"/>
+  <text x="846" y="113" font-size="15" fill="#333333">1,000 updateSchemaStatus() calls (~17/s)</text>
+
+  <!-- lane 2: register -->
+  <text x="110" y="164" font-size="16" font-weight="bold" fill="#0A544C">version register</text>
+  <rect x="110" y="172" width="720" height="12" fill="#0E6E63"/>
+  <text x="846" y="186" font-size="15" fill="#0A544C">moves with every mutation: one put each, zero fan-out</text>
+
+  <!-- lane 3: hints on the wire -->
+  <text x="110" y="234" font-size="16" font-weight="bold" fill="#1A1A1A">hints on the wire</text>
+  <rect x="110" y="242" width="720" height="22" fill="url(#hintticks)" stroke="#888888" stroke-width="0.8"/>
+  <text x="846" y="259" font-size="15" fill="#333333">one per 500 ms window: &#8804; 121 events total, not 1,000</text>
+
+  <!-- lane 4: receiver full resyncs -->
+  <text x="110" y="308" font-size="16" font-weight="bold" fill="#1A1A1A">full resyncs <tspan font-weight="normal" fill="#777777" font-size="14">(per server)</tspan></text>
+  <g fill="#B03A2E">
+    <rect x="344" y="318" width="12" height="26" rx="2"/>
+    <rect x="584" y="318" width="12" height="26" rx="2"/>
+    <rect x="824" y="318" width="12" height="26" rx="2"/>
+    <rect x="944" y="318" width="12" height="26" rx="2"/>
+  </g>
+  <text x="846" y="368" font-size="15" fill="#333333">about one per 2 &#215; reconcile interval while the burst lasts,</text>
+  <text x="846" y="388" font-size="15" fill="#333333">plus at most one after: &#8804; 4 per server, independent of M</text>
+
+  <!-- staleness window shading -->
+  <rect x="830" y="404" width="240" height="40" fill="#E9F3F1" stroke="#0E6E63" stroke-width="1.2"/>
+  <text x="950" y="429" font-size="15" fill="#0A544C" text-anchor="middle">&#8804; 2 &#215; 10 s after the last mutation</text>
+
+  <!-- summary -->
+  <rect x="40" y="514" width="1220" height="1" fill="#DDDDDD"/>
+  <text x="40" y="542" font-size="16" fill="#333333">Per-op broadcast: 10,000 full clears. This design: &#8804; 121 events and &#8804; 40 resyncs cluster-wide, and losing every event only falls back to the poll bound.</text>
+</svg>

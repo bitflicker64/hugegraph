@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 800" width="1300" height="800">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b91c1c"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1300" height="800" fill="#ffffff"/>
+  <text x="650" y="42" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="bold" fill="#0f172a">#3227: a Store rebuilt with an empty volume never rejoins; the group record is overwritten back</text>
+
+  <!-- setup band -->
+  <rect x="60" y="66" width="340" height="74" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="230" y="96" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">store-2 loses its data volume;</text>
+  <text x="230" y="122" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">StatefulSet rebuilds the pod</text>
+
+  <rect x="480" y="66" width="340" height="74" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="650" y="96" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">same DNS raft address addr2,</text>
+  <text x="650" y="122" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">empty disk: registers NEW id Y</text>
+
+  <rect x="900" y="66" width="340" height="74" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="1070" y="96" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">old id X stays in PD at addr2;</text>
+  <text x="1070" y="122" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">operator retires X (Tombstone)</text>
+
+  <line x1="400" y1="103" x2="472" y2="103" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="820" y1="103" x2="892" y2="103" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- PD box -->
+  <rect x="60" y="185" width="500" height="390" rx="10" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="310" y="220" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" font-weight="bold" fill="#1d4ed8">PD leader</text>
+
+  <text x="90" y="262" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">patrolPartitions after the Tombstone:</text>
+  <text x="90" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">reallocShards computes the right list</text>
+  <rect x="90" y="308" width="440" height="44" rx="6" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+  <text x="310" y="337" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#15803d">shardGroups[N] := [S0, S1, Y]   (correct)</text>
+
+  <text x="90" y="500" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">heartbeat write-back lands:</text>
+  <rect x="90" y="514" width="440" height="44" rx="6" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.5"/>
+  <text x="310" y="543" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#b91c1c">shardGroups[N] := [S0, S1, X]   (overwritten)</text>
+
+  <!-- Store box -->
+  <rect x="740" y="185" width="500" height="390" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+  <text x="990" y="220" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" font-weight="bold" fill="#b45309">Store leader of group N</text>
+
+  <text x="770" y="262" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">changePeers with (addr0, addr1, addr2):</text>
+  <text x="770" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">addr2 is already a raft peer, so jraft</text>
+  <text x="770" y="318" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">sees no membership change:</text>
+  <rect x="770" y="336" width="440" height="44" rx="6" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.5"/>
+  <text x="990" y="365" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#b91c1c">no snapshot is ever sent; Y stays empty</text>
+
+  <text x="770" y="428" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">onConfigurationCommitted maps addr2</text>
+  <text x="770" y="456" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">back to an id through the STALE local</text>
+  <text x="770" y="484" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#0f172a">shard group, which still lists X</text>
+  <text x="770" y="516" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#64748b">PartitionManager.getStoreByRaftEndpoint : 873</text>
+  <text x="770" y="540" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#64748b">PartitionEngine.onConfigurationCommitted : 631</text>
+
+  <!-- arrows between boxes -->
+  <line x1="560" y1="330" x2="732" y2="330" stroke="#334155" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="646" y="308" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#334155">fireChangeShard</text>
+  <text x="646" y="356" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#334155">(conf change)</text>
+
+  <line x1="732" y1="470" x2="560" y2="470" stroke="#b91c1c" stroke-width="2.5" marker-end="url(#arrRed)"/>
+  <text x="646" y="448" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#b91c1c">updateShardGroup</text>
+  <text x="646" y="496" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#b91c1c">[S0, S1, X]</text>
+
+  <text x="650" y="605" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#334155">The loop repeats on every patrol. DELETE /v1/store/X and balancePartitions do not break it (measured stable for 20+ minutes).</text>
+
+  <!-- end state band -->
+  <rect x="60" y="630" width="570" height="140" rx="10" fill="#f0fdf4" stroke="#15803d" stroke-width="2"/>
+  <text x="345" y="662" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#15803d">Every health surface reads healthy</text>
+  <text x="345" y="696" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#166534">/v1/stores: 3 Up &#183; cluster state: Cluster_OK</text>
+  <text x="345" y="726" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#166534">Hubble: 3 Stores UP &#183; all pods Ready</text>
+
+  <rect x="670" y="630" width="570" height="140" rx="10" fill="#fef2f2" stroke="#b91c1c" stroke-width="2"/>
+  <text x="955" y="662" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#b91c1c">What is actually true</text>
+  <text x="955" y="696" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#991b1b">all 12 groups name the deleted id X &#183; Y holds 0 partitions</text>
+  <text x="955" y="726" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#991b1b">every group runs on 2 live replicas, one disk failure from data loss</text>
+</svg>

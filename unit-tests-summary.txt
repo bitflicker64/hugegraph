@@ -1,0 +1,14 @@
+build EXIT 0
+store-core-test EXIT 0 [[1;34mINFO[m] [1;32mTests run: 22, Failures: 0, Errors: 0, Skipped: 0[m
+store-raftcore-test EXIT 0 [[1;34mINFO[m] [1;32mTests run: 9, Failures: 0, Errors: 0, Skipped: 0[m
+pd-core-test EXIT 0 [[1;33mWARNING[m] [1;33mTests run: 104, Failures: 0, Errors: 0, Skipped: 2[m
+DONE
+build EXIT 1
+store-core-test EXIT 0 [[1;34mINFO[m] [1;32mTests run: 30, Failures: 0, Errors: 0, Skipped: 0[m
+store-raftcore-test EXIT 0 [[1;34mINFO[m] [1;32mTests run: 9, Failures: 0, Errors: 0, Skipped: 0[m
+pd-core-test EXIT 0 [[1;33mWARNING[m] [1;33mTests run: 104, Failures: 0, Errors: 0, Skipped: 2[m
+editorconfig EXIT 0
+DONE
+
+     [exec] 
+build2 EXIT 0 (after removing hugegraph-pd/hg-pd-test/tmp left by the baseline run)

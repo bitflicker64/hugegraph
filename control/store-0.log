@@ -1,0 +1,295 @@
+2026-09-24 06:29:23 [grpc-default-executor-4] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Receiving a notice [ PULSE_TYPE_UNKNOWN ], notice_id: 1790231363936, observer_id: 1790231105108
+2026-09-24 06:29:23 [ack-notice-pool-0] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Sending ack, notice id: 1790231363936, observer id: 1790231105108, ts: 1790231363947
+2026-09-24 06:29:23 [grpc-default-executor-4] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Receiving a notice [ PULSE_TYPE_UNKNOWN ], notice_id: 1790231363955, observer_id: 1790231105108
+2026-09-24 06:29:23 [hg-u-job-1] [INFO] o.a.h.s.p.ChangeShardProcessor - Partition DEFAULT/hugegraph/g-0 receive change shard message, shard {
+  store_id: 4544463310588084737
+  role: Leader
+}
+shard {
+  store_id: 7111541207686793717
+  role: Follower
+}
+shard {
+  store_id: 7710548841109375503
+}
+change_type: CONF_CHANGE_TYPE_ADJUST
+
+2026-09-24 06:29:23 [grpc-default-executor-4] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Receiving a notice [ PULSE_TYPE_UNKNOWN ], notice_id: 1790231363975, observer_id: 1790231105108
+2026-09-24 06:29:23 [hg-u-job-1] [INFO] o.a.h.s.PartitionEngine - Raft 0 doChangeShard task is type: Change_Shard
+state: Task_Ready
+partition {
+  graph_name: "DEFAULT/hugegraph/g"
+  end_key: 5462
+  state: PState_Normal
+}
+changeShard {
+  shard {
+    store_id: 4544463310588084737
+    role: Leader
+  }
+  shard {
+    store_id: 7111541207686793717
+    role: Follower
+  }
+  shard {
+    store_id: 7710548841109375503
+  }
+  change_type: CONF_CHANGE_TYPE_ADJUST
+}
+
+2026-09-24 06:29:23 [hg-u-job-1] [INFO] o.a.h.s.p.ChangeShardProcessor - Partition DEFAULT/hugegraph/g-0 change shard complete, status is Status[OK]
+2026-09-24 06:29:23 [JRaft-Closure-Executor-3] [INFO] o.a.h.s.PartitionEngine - Raft 0 changePeers start, old peer is [hugegraph-store-0.hugegraph-store.hg.svc:8510, hugegraph-store-2.hugegraph-store.hg.svc:8510, hugegraph-store-1.hugegraph-store.hg.svc:8510], new peer is [hugegraph-store-0.hugegraph-store.hg.svc:8510, hugegraph-store-1.hugegraph-store.hg.svc:8510, hugegraph-store-2.hugegraph-store.hg.svc:8510]
+2026-09-24 06:29:23 [JRaft-Closure-Executor-3] [INFO] o.a.h.s.PartitionEngine - Raft 0 doChangeShard result is Status[OK]
+2026-09-24 06:29:23 [grpc-default-executor-4] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Receiving a notice [ PULSE_TYPE_UNKNOWN ], notice_id: 1790231363993, observer_id: 1790231105108
+2026-09-24 06:29:24 [ack-notice-pool-0] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Sending ack, notice id: 1790231363993, observer id: 1790231105108, ts: 1790231364000
+2026-09-24 06:29:24 [hg-u-job-2] [INFO] o.a.h.s.p.ChangeShardProcessor - Partition DEFAULT/hugegraph/g-11 receive change shard message, shard {
+  store_id: 7111541207686793717
+  role: Follower
+}
+shard {
+  store_id: 4544463310588084737
+  role: Leader
+}
+shard {
+  store_id: 7710548841109375503
+}
+change_type: CONF_CHANGE_TYPE_ADJUST
+
+2026-09-24 06:29:24 [hg-u-job-2] [INFO] o.a.h.s.PartitionEngine - Raft 11 doChangeShard task is id: 3
+type: Change_Shard
+state: Task_Ready
+partition {
+  id: 11
+  graph_name: "DEFAULT/hugegraph/g"
+  start_key: 60082
+  end_key: 65544
+  state: PState_Normal
+}
+changeShard {
+  shard {
+    store_id: 7111541207686793717
+    role: Follower
+  }
+  shard {
+    store_id: 4544463310588084737
+    role: Leader
+  }
+  shard {
+    store_id: 7710548841109375503
+  }
+  change_type: CONF_CHANGE_TYPE_ADJUST
+}
+
+2026-09-24 06:29:24 [hg-u-job-2] [INFO] o.a.h.s.p.ChangeShardProcessor - Partition DEFAULT/hugegraph/g-11 change shard complete, status is Status[OK]
+2026-09-24 06:29:24 [JRaft-Closure-Executor-3] [INFO] o.a.h.s.PartitionEngine - Raft 11 doChangeShard result is Status[OK]
+2026-09-24 06:29:24 [grpc-default-executor-4] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Receiving a notice [ PULSE_TYPE_UNKNOWN ], notice_id: 1790231364015, observer_id: 1790231105108
+2026-09-24 06:29:24 [ack-notice-pool-0] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Sending ack, notice id: 1790231364015, observer id: 1790231105108, ts: 1790231364016
+2026-09-24 06:29:24 [hg-u-job-3] [INFO] o.a.h.s.p.ChangeShardProcessor - Partition DEFAULT/hugegraph/g-2 receive change shard message, shard {
+  store_id: 7111541207686793717
+  role: Follower
+}
+shard {
+  store_id: 4544463310588084737
+  role: Leader
+}
+shard {
+  store_id: 7710548841109375503
+}
+change_type: CONF_CHANGE_TYPE_ADJUST
+
+2026-09-24 06:29:24 [hg-u-job-3] [INFO] o.a.h.s.PartitionEngine - Raft 2 doChangeShard task is id: 4
+type: Change_Shard
+state: Task_Ready
+partition {
+  id: 2
+  graph_name: "DEFAULT/hugegraph/g"
+  start_key: 10924
+  end_key: 16386
+  state: PState_Normal
+}
+changeShard {
+  shard {
+    store_id: 7111541207686793717
+    role: Follower
+  }
+  shard {
+    store_id: 4544463310588084737
+    role: Leader
+  }
+  shard {
+    store_id: 7710548841109375503
+  }
+  change_type: CONF_CHANGE_TYPE_ADJUST
+}
+
+2026-09-24 06:29:24 [hg-u-job-3] [INFO] o.a.h.s.p.ChangeShardProcessor - Partition DEFAULT/hugegraph/g-2 change shard complete, status is Status[OK]
+2026-09-24 06:29:24 [JRaft-Closure-Executor-3] [INFO] o.a.h.s.PartitionEngine - Raft 2 doChangeShard result is Status[OK]
+2026-09-24 06:29:24 [grpc-default-executor-4] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Receiving a notice [ PULSE_TYPE_UNKNOWN ], notice_id: 1790231364029, observer_id: 1790231105108
+2026-09-24 06:29:24 [grpc-default-executor-4] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Receiving a notice [ PULSE_TYPE_UNKNOWN ], notice_id: 1790231364042, observer_id: 1790231105108
+2026-09-24 06:29:24 [grpc-default-executor-4] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Receiving a notice [ PULSE_TYPE_UNKNOWN ], notice_id: 1790231364056, observer_id: 1790231105108
+2026-09-24 06:29:24 [ack-notice-pool-0] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Sending ack, notice id: 1790231364056, observer id: 1790231105108, ts: 1790231364058
+2026-09-24 06:29:24 [hg-u-job-4] [INFO] o.a.h.s.p.ChangeShardProcessor - Partition DEFAULT/hugegraph/g-5 receive change shard message, shard {
+  store_id: 7111541207686793717
+  role: Follower
+}
+shard {
+  store_id: 4544463310588084737
+  role: Leader
+}
+shard {
+  store_id: 7710548841109375503
+}
+change_type: CONF_CHANGE_TYPE_ADJUST
+
+2026-09-24 06:29:24 [hg-u-job-4] [INFO] o.a.h.s.PartitionEngine - Raft 5 doChangeShard task is id: 7
+type: Change_Shard
+state: Task_Ready
+partition {
+  id: 5
+  graph_name: "DEFAULT/hugegraph/g"
+  start_key: 27310
+  end_key: 32772
+  state: PState_Normal
+}
+changeShard {
+  shard {
+    store_id: 7111541207686793717
+    role: Follower
+  }
+  shard {
+    store_id: 4544463310588084737
+    role: Leader
+  }
+  shard {
+    store_id: 7710548841109375503
+  }
+  change_type: CONF_CHANGE_TYPE_ADJUST
+}
+
+2026-09-24 06:29:24 [JRaft-Closure-Executor-3] [INFO] o.a.h.s.PartitionEngine - Raft 5 doChangeShard result is Status[OK]
+2026-09-24 06:29:24 [hg-u-job-4] [INFO] o.a.h.s.p.ChangeShardProcessor - Partition DEFAULT/hugegraph/g-5 change shard complete, status is Status[OK]
+2026-09-24 06:29:24 [grpc-default-executor-4] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Receiving a notice [ PULSE_TYPE_UNKNOWN ], notice_id: 1790231364071, observer_id: 1790231105108
+2026-09-24 06:29:24 [grpc-default-executor-4] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Receiving a notice [ PULSE_TYPE_UNKNOWN ], notice_id: 1790231364087, observer_id: 1790231105108
+2026-09-24 06:29:24 [ack-notice-pool-0] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Sending ack, notice id: 1790231364087, observer id: 1790231105108, ts: 1790231364088
+2026-09-24 06:29:24 [hg-u-job-1] [INFO] o.a.h.s.p.ChangeShardProcessor - Partition DEFAULT/hugegraph/g-7 receive change shard message, shard {
+  store_id: 7111541207686793717
+  role: Follower
+}
+shard {
+  store_id: 4544463310588084737
+  role: Leader
+}
+shard {
+  store_id: 7710548841109375503
+}
+change_type: CONF_CHANGE_TYPE_ADJUST
+
+2026-09-24 06:29:24 [hg-u-job-1] [INFO] o.a.h.s.PartitionEngine - Raft 7 doChangeShard task is id: 9
+type: Change_Shard
+state: Task_Ready
+partition {
+  id: 7
+  graph_name: "DEFAULT/hugegraph/g"
+  start_key: 38234
+  end_key: 43696
+  state: PState_Normal
+}
+changeShard {
+  shard {
+    store_id: 7111541207686793717
+    role: Follower
+  }
+  shard {
+    store_id: 4544463310588084737
+    role: Leader
+  }
+  shard {
+    store_id: 7710548841109375503
+  }
+  change_type: CONF_CHANGE_TYPE_ADJUST
+}
+
+2026-09-24 06:29:24 [hg-u-job-1] [INFO] o.a.h.s.p.ChangeShardProcessor - Partition DEFAULT/hugegraph/g-7 change shard complete, status is Status[OK]
+2026-09-24 06:29:24 [JRaft-Closure-Executor-3] [INFO] o.a.h.s.PartitionEngine - Raft 7 changePeers start, old peer is [hugegraph-store-2.hugegraph-store.hg.svc:8510, hugegraph-store-1.hugegraph-store.hg.svc:8510, hugegraph-store-0.hugegraph-store.hg.svc:8510], new peer is [hugegraph-store-1.hugegraph-store.hg.svc:8510, hugegraph-store-0.hugegraph-store.hg.svc:8510, hugegraph-store-2.hugegraph-store.hg.svc:8510]
+2026-09-24 06:29:24 [JRaft-Closure-Executor-3] [INFO] o.a.h.s.PartitionEngine - Raft 7 doChangeShard result is Status[OK]
+2026-09-24 06:29:24 [grpc-default-executor-4] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Receiving a notice [ PULSE_TYPE_UNKNOWN ], notice_id: 1790231364100, observer_id: 1790231105108
+2026-09-24 06:29:24 [grpc-default-executor-4] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Receiving a notice [ PULSE_TYPE_UNKNOWN ], notice_id: 1790231364114, observer_id: 1790231105108
+2026-09-24 06:29:24 [hg-u-job-2] [INFO] o.a.h.s.p.ChangeShardProcessor - Partition DEFAULT/hugegraph/g-9 receive change shard message, shard {
+  store_id: 4544463310588084737
+  role: Leader
+}
+shard {
+  store_id: 7111541207686793717
+  role: Follower
+}
+shard {
+  store_id: 7710548841109375503
+}
+change_type: CONF_CHANGE_TYPE_ADJUST
+
+2026-09-24 06:29:24 [ack-notice-pool-0] [INFO] o.a.h.p.c.i.PDPulseImpl2 - [PULSE] Sending ack, notice id: 1790231364114, observer id: 1790231105108, ts: 1790231364116
+2026-09-24 06:29:24 [hg-u-job-2] [INFO] o.a.h.s.PartitionEngine - Raft 9 doChangeShard task is id: 11
+type: Change_Shard
+state: Task_Ready
+partition {
+  id: 9
+  graph_name: "DEFAULT/hugegraph/g"
+  start_key: 49158
+  end_key: 54620
+  state: PState_Normal
+}
+changeShard {
+  shard {
+    store_id: 4544463310588084737
+    role: Leader
+  }
+  shard {
+    store_id: 7111541207686793717
+    role: Follower
+  }
+  shard {
+    store_id: 7710548841109375503
+  }
+  change_type: CONF_CHANGE_TYPE_ADJUST
+}
+
+2026-09-24 06:29:24 [hg-u-job-2] [INFO] o.a.h.s.p.ChangeShardProcessor - Partition DEFAULT/hugegraph/g-9 change shard complete, status is Status[OK]
+2026-09-24 06:29:24 [grpc-default-executor-4] [INFO] o.a.h.p.c.PDClient - PDClient receive store event UNKNOWN 4f056c628fe8a044
+2026-09-24 06:29:24 [JRaft-Closure-Executor-3] [INFO] o.a.h.s.PartitionEngine - Raft 9 changePeers start, old peer is [hugegraph-store-0.hugegraph-store.hg.svc:8510, hugegraph-store-2.hugegraph-store.hg.svc:8510, hugegraph-store-1.hugegraph-store.hg.svc:8510], new peer is [hugegraph-store-0.hugegraph-store.hg.svc:8510, hugegraph-store-1.hugegraph-store.hg.svc:8510, hugegraph-store-2.hugegraph-store.hg.svc:8510]
+2026-09-24 06:29:24 [JRaft-Closure-Executor-3] [INFO] o.a.h.s.PartitionEngine - Raft 9 doChangeShard result is Status[OK]
+2026-09-24 06:41:03 [hg-u-job-3] [INFO] o.a.h.r.a.RocksDBSession - begin save snapshot at /hugegraph-store/storage/raft/00003/snapshot/temp/data
+2026-09-24 06:41:03 [hg-u-job-3] [INFO] o.a.h.r.a.RocksDBSession - saved snapshot into /hugegraph-store/storage/raft/00003/snapshot/temp/data, time cost 38 ms
+2026-09-24 06:41:03 [hg-u-job-3] [INFO] o.a.h.s.r.PartitionStateMachine - Raft 3 onSnapshotSave success
+2026-09-24 06:42:13 [hg-u-job-4] [INFO] o.a.h.r.a.RocksDBSession - begin save snapshot at /hugegraph-store/storage/raft/00002/snapshot/temp/data
+2026-09-24 06:42:13 [hg-u-job-4] [INFO] o.a.h.r.a.RocksDBSession - saved snapshot into /hugegraph-store/storage/raft/00002/snapshot/temp/data, time cost 23 ms
+2026-09-24 06:42:13 [hg-u-job-4] [INFO] o.a.h.s.r.PartitionStateMachine - Raft 2 onSnapshotSave success
+2026-09-24 06:42:29 [hg-u-job-1] [INFO] o.a.h.r.a.RocksDBSession - begin save snapshot at /hugegraph-store/storage/raft/00000/snapshot/temp/data
+2026-09-24 06:42:29 [hg-u-job-1] [INFO] o.a.h.r.a.RocksDBSession - saved snapshot into /hugegraph-store/storage/raft/00000/snapshot/temp/data, time cost 22 ms
+2026-09-24 06:42:29 [hg-u-job-1] [INFO] o.a.h.s.r.PartitionStateMachine - Raft 0 onSnapshotSave success
+2026-09-24 06:43:29 [hg-u-job-2] [INFO] o.a.h.r.a.RocksDBSession - begin save snapshot at /hugegraph-store/storage/raft/00010/snapshot/temp/data
+2026-09-24 06:43:29 [hg-u-job-2] [INFO] o.a.h.r.a.RocksDBSession - saved snapshot into /hugegraph-store/storage/raft/00010/snapshot/temp/data, time cost 23 ms
+2026-09-24 06:43:29 [hg-u-job-2] [INFO] o.a.h.s.r.PartitionStateMachine - Raft 10 onSnapshotSave success
+2026-09-24 06:45:06 [hg-u-job-3] [INFO] o.a.h.r.a.RocksDBSession - begin save snapshot at /hugegraph-store/storage/raft/00004/snapshot/temp/data
+2026-09-24 06:45:06 [hg-u-job-3] [INFO] o.a.h.r.a.RocksDBSession - saved snapshot into /hugegraph-store/storage/raft/00004/snapshot/temp/data, time cost 23 ms
+2026-09-24 06:45:06 [hg-u-job-3] [INFO] o.a.h.s.r.PartitionStateMachine - Raft 4 onSnapshotSave success
+2026-09-24 06:45:12 [hg-u-job-4] [INFO] o.a.h.r.a.RocksDBSession - begin save snapshot at /hugegraph-store/storage/raft/00005/snapshot/temp/data
+2026-09-24 06:45:12 [hg-u-job-4] [INFO] o.a.h.r.a.RocksDBSession - saved snapshot into /hugegraph-store/storage/raft/00005/snapshot/temp/data, time cost 22 ms
+2026-09-24 06:45:12 [hg-u-job-4] [INFO] o.a.h.s.r.PartitionStateMachine - Raft 5 onSnapshotSave success
+2026-09-24 06:45:29 [hg-u-job-1] [INFO] o.a.h.r.a.RocksDBSession - begin save snapshot at /hugegraph-store/storage/raft/00001/snapshot/temp/data
+2026-09-24 06:45:29 [hg-u-job-1] [INFO] o.a.h.r.a.RocksDBSession - saved snapshot into /hugegraph-store/storage/raft/00001/snapshot/temp/data, time cost 22 ms
+2026-09-24 06:45:29 [hg-u-job-1] [INFO] o.a.h.s.r.PartitionStateMachine - Raft 1 onSnapshotSave success
+2026-09-24 06:46:45 [hg-u-job-2] [INFO] o.a.h.r.a.RocksDBSession - begin save snapshot at /hugegraph-store/storage/raft/00009/snapshot/temp/data
+2026-09-24 06:46:45 [hg-u-job-2] [INFO] o.a.h.r.a.RocksDBSession - saved snapshot into /hugegraph-store/storage/raft/00009/snapshot/temp/data, time cost 22 ms
+2026-09-24 06:46:45 [hg-u-job-2] [INFO] o.a.h.s.r.PartitionStateMachine - Raft 9 onSnapshotSave success
+2026-09-24 06:49:33 [hg-u-job-3] [INFO] o.a.h.r.a.RocksDBSession - begin save snapshot at /hugegraph-store/storage/raft/00007/snapshot/temp/data
+2026-09-24 06:49:33 [hg-u-job-3] [INFO] o.a.h.r.a.RocksDBSession - saved snapshot into /hugegraph-store/storage/raft/00007/snapshot/temp/data, time cost 18 ms
+2026-09-24 06:49:33 [hg-u-job-3] [INFO] o.a.h.s.r.PartitionStateMachine - Raft 7 onSnapshotSave success
+2026-09-24 06:49:34 [hg-u-job-4] [INFO] o.a.h.r.a.RocksDBSession - begin save snapshot at /hugegraph-store/storage/raft/00011/snapshot/temp/data
+2026-09-24 06:49:34 [hg-u-job-4] [INFO] o.a.h.r.a.RocksDBSession - saved snapshot into /hugegraph-store/storage/raft/00011/snapshot/temp/data, time cost 26 ms
+2026-09-24 06:49:34 [hg-u-job-4] [INFO] o.a.h.s.r.PartitionStateMachine - Raft 11 onSnapshotSave success
+2026-09-24 06:50:57 [hg-u-job-1] [INFO] o.a.h.r.a.RocksDBSession - begin save snapshot at /hugegraph-store/storage/raft/00008/snapshot/temp/data
+2026-09-24 06:50:57 [hg-u-job-1] [INFO] o.a.h.r.a.RocksDBSession - saved snapshot into /hugegraph-store/storage/raft/00008/snapshot/temp/data, time cost 21 ms
+2026-09-24 06:50:57 [hg-u-job-1] [INFO] o.a.h.s.r.PartitionStateMachine - Raft 8 onSnapshotSave success
+2026-09-24 06:54:04 [hg-u-job-2] [INFO] o.a.h.r.a.RocksDBSession - begin save snapshot at /hugegraph-store/storage/raft/00006/snapshot/temp/data
+2026-09-24 06:54:04 [hg-u-job-2] [INFO] o.a.h.r.a.RocksDBSession - saved snapshot into /hugegraph-store/storage/raft/00006/snapshot/temp/data, time cost 21 ms
+2026-09-24 06:54:04 [hg-u-job-2] [INFO] o.a.h.s.r.PartitionStateMachine - Raft 6 onSnapshotSave success

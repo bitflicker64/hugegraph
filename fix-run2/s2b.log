@@ -1,0 +1,178 @@
+2026-09-24T07:33:08.891Z 0 chart 26bbbcefb5df5cf5f2d1667d20be42899bae3a2b tag fix
+2026-09-24T07:33:55.897Z 0 loaded hg3227/pd:fix sha256:9a411c98f1971e10f6bbadc22420af2f218390b266d68aa8d5056e5231679274 rev=9b6bf414b44b668762f38973bdee3b85433c3ef8
+2026-09-24T07:34:31.945Z 0 loaded hg3227/store:fix sha256:764ac9d8af11f62ffc7e74e3fe7bcff7f21d50c2e7d4fd26bf31431298774ed1 rev=9b6bf414b44b668762f38973bdee3b85433c3ef8
+2026-09-24T07:35:43.878Z 0 loaded hg3227/server:fix sha256:a809c126fb13cff57764c5c6136fa5adf4914d6e1cab3d79dacc2b57d822c9bc rev=9b6bf414b44b668762f38973bdee3b85433c3ef8
+2026-09-24T07:36:50.680Z 0 loaded hg3227/hubble:control sha256:346125b842d06bfa2d4c9c5e93a4c13ea11b436ff79853db9403af47c224e7f0 rev=3b385c3d2f1c04f7fa4b4534b4b1ec220627bfb5
+2026-09-24T07:37:13.494Z 0 loaded hg3227/probe:1 
+2026-09-24T07:40:46.089Z 0 helm install rc=0 in 213s
+2026-09-24T07:40:46.344Z 0 running pd imageID sha256:9a411c98f1971e10f6bbadc22420af2f218390b266d68aa8d5056e5231679274
+2026-09-24T07:40:46.385Z 0 running store imageID sha256:764ac9d8af11f62ffc7e74e3fe7bcff7f21d50c2e7d4fd26bf31431298774ed1
+2026-09-24T07:40:46.495Z 0 running server imageID sha256:a809c126fb13cff57764c5c6136fa5adf4914d6e1cab3d79dacc2b57d822c9bc
+schema propertykeys 202
+schema propertykeys 202
+schema vertexlabels 201
+schema edgelabels 201
+201 201 201 201 201 201 201 201 201 201 201 201 201 201 201 201 201 201 
+2026-09-24T07:41:55.969Z S2b.0 leader pd-0 X=1395129130015651005 groups_with_X=12 datasize s0 243MB s1 243MB s2 243MB 
+2026-09-24T07:41:56.502Z S2b.1 delete PVC then pod
+2026-09-24T07:44:32.866Z S2b.1 pod Ready after 156s; Y=6458691603230516813 rows_at_addr=1395129130015651005:Up,6458691603230516813:Up reg=Register Store id= 6458691603230516813
+2026-09-24T07:44:33.295Z S2b.5 Tombstone X on leader pd-0 -> {"status": 0,"store": {
+  "id": "1395129130015651005",
+  "address": "hugegraph-store-2.hugegraph-store.hg.svc:8500",
+  "raftAddress": "hugegraph-store-2.hugegraph-store.hg.svc:8510",
+  "labels": [{
+    "key": "rest.port",
+    "value": "8520"
+  }],
+  "version": "1.7.0",
+  "state": "Tombstone",
+  "startTimestamp": "1790235627078",
+  "deployPath": "file:/hugegraph-store/lib/hg-store-node-1.7.0.jar!/BOOT-INF/classes!/",
+  "lastHeartbeat": "1790235691388",
+  "stats": {
+    "storeId": "1395129130015651005",
+    "capacity": "308553281536",
+    "available": "75246870528",
+    "partitionCount": 12,
+    "startTime": 1790235627,
+    "usedSize": "38657773062",
+    "graphStats": [{
+      "graphName": "DEFAULT/hugegraph/g",
+      "approximateSize": "54",
+      "approximateKeys": "1546",
+      "role": "Follower",
+      "workState": "PState_Normal"
+    }, {
+      "graphName": "DEFAULT/hugegraph/g",
+      "approximateSize": "56",
+      "approximateKeys": "1598",
+      "partitionId": 1,
+      "role": "Follower",
+      "workState": "PState_Normal"
+    }, {
+      "graphName": "DEFAULT/hugegraph/g",
+      "approximateSize": "54",
+      "approximateKeys": "1557",
+      "partitionId": 2,
+      "role": "Follower",
+      "workState": "PState_Normal"
+    }, {
+      "graphName": "DEFAULT/hugegraph/g",
+      "approximateSize": "54",
+      "approximateKeys": "1543",
+      "partitionId": 3,
+      "role": "Leader",
+      "workState": "PState_Normal"
+    }, {
+      "graphName": "DEFAULT/hugegraph/g",
+      "approximateSize": "52",
+      "approximateKeys": "1485",
+      "partitionId": 4,
+      "role": "Follower",
+      "workState": "PState_Normal"
+    }, {
+      "graphName": "DEFAULT/hugegraph/g",
+      "approximateSize": "53",
+      "approximateKeys": "1520",
+      "partitionId": 5,
+      "role": "Leader",
+      "workState": "PState_Normal"
+    }, {
+      "graphName": "DEFAULT/hugegraph/g",
+      "approximateSize": "51",
+      "approximateKeys": "1464",
+      "partitionId": 6,
+      "role": "Follower",
+      "workState": "PState_Normal"
+    }, {
+      "graphName": "DEFAULT/hugegraph/g",
+      "approximateSize": "52",
+      "approximateKeys": "1502",
+      "partitionId": 7,
+      "role": "Leader",
+      "workState": "PState_Normal"
+    }, {
+      "graphName": "DEFAULT/hugegraph/g",
+      "approximateSize": "53",
+      "approximateKeys": "1530",
+      "partitionId": 8,
+      "role": "Follower",
+      "workState": "PState_Normal"
+    }, {
+      "graphName": "DEFAULT/hugegraph/g",
+      "approximateSize": "48",
+      "approximateKeys": "1527",
+      "partitionId": 9,
+      "role": "Leader",
+      "workState": "PState_Normal"
+    }, {
+      "graphName": "DEFAULT/hugegraph/g",
+      "approximateSize": "56",
+      "approximateKeys": "1610",
+      "partitionId": 10,
+      "role": "Follower",
+      "workState": "PState_Normal"
+    }, {
+      "graphName": "DEFAULT/hugegraph/g",
+      "approximateSize": "51",
+      "approximateKeys": "1468",
+      "partitionId": 11,
+      "role": "Follower",
+      "workState": "PState_Normal"
+    }],
+    "raftStats": [{
+      "committedIndex": "41"
+    }, {
+      "partitionId": 1,
+      "committedIndex": "44"
+    }, {
+      "partitionId": 2,
+      "committedIndex": "42"
+    }, {
+      "partitionId": 3,
+      "committedIndex": "32"
+    }, {
+      "partitionId": 4,
+      "committedIndex": "44"
+    }, {
+      "partitionId": 5,
+      "committedIndex": "41"
+    }, {
+      "partitionId": 6,
+      "committedIndex": "53"
+    }, {
+      "partitionId": 7,
+      "committedIndex": "47"
+    }, {
+      "partitionId": 8,
+      "committedIndex": "44"
+    }, {
+      "partitionId": 9,
+      "committedIndex": "57"
+    }, {
+      "partitionId": 10,
+      "committedIndex": "45"
+    }, {
+      "partitionId": 11,
+      "committedIndex": "39"
+    }],
+    "cores": 4
+  },
+  "dataVersion": 1,
+  "cores": 4,
+  "dataPath": "/hugegraph-store/storage"
+}} [200]
+2026-09-24T07:44:33.352Z S2b.6 patrolPartitions -> {"status": 0,"partitions": [ ]} [200]
+2026-09-24T07:44:49.669Z S2b.7 converged=1 after 17s since Tombstone: {"groups":12,"full":12,"oneleader":12,"badstore":0,"withX":0,"withY":12} s2_partitions_200=12/12
+2026-09-24T07:44:50.333Z S2b.7 datasize s0 244MB s1 244MB s2 243MB 
+2026-09-24T07:44:50.438Z S2b.7 stores [{"id":"1162114101962616396","state":"Up","partitionCount":12},{"id":"3220564807436900364","state":"Up","partitionCount":12},{"id":"1395129130015651005","state":"Tombstone","partitionCount":12},{"id":"6458691603230516813","state":"Up","partitionCount":0}] counts={"Tombstone":1,"Up":3} cluster={"state":"Cluster_OK","stores":4}
+2026-09-24T07:49:55.485Z 4b health after 300s: stores=["116211:Up:12","322056:Up:12","139512:Tombstone:12","645869:Up:12"] counts={"Tombstone":1,"Up":3} cluster=Cluster_OK groups={"withX":0,"withY":12,"state":["PState_Normal:12"]} s2_200=12/12
+2026-09-24T07:49:55.515Z 4b second patrolPartitions -> {"status": 0,"partitions": [ ]} [200]
+2026-09-24T07:50:26.013Z 4b after second patrol: stores=["116211:Up:12","322056:Up:12","139512:Tombstone:12","645869:Up:12"] counts={"Tombstone":1,"Up":3} cluster=Cluster_OK groups={"withX":0,"withY":12,"state":["PState_Normal:12"]} s2_200=12/12
+2026-09-24T07:50:26.014Z 4b restart store-2 keeping its PVC
+2026-09-24T07:53:57.779Z 4b store-2 Ready after 151s, restarts=0 reg=Register Store id= 6458691603230516813 exit_illegal=0 stores=["116211:Up:12","322056:Up:12","139512:Tombstone:12","645869:Up:12"] counts={"Tombstone":1,"Up":3} cluster=Cluster_OK groups={"withX":0,"withY":12,"state":["PState_Normal:12"]} s2_200=12/12
+2026-09-24T07:53:58.205Z extra DELETE X -> OK [200]
+2026-09-24T07:54:28.302Z extra after DELETE: groups naming X=0 naming Y=12 X_record=0
+2026-09-24T07:54:36.111Z data run=s2bfix vertex_attempts=1492 vertex_acked=1492 vertex_failed=0 edge_acked=1490 verified_ok=2982 missing=0
+2026-09-24T07:54:36.444Z logs changePeers=8 installSnapshot=13 onConfigurationCommitted_withX=0
+DONE

@@ -1,0 +1,180 @@
+{"status": 0,"shardGroups": [ {
+  "version": "2",
+  "confVer": "1",
+  "shards": [{
+    "storeId": "4544463310588084737",
+    "role": "Leader"
+  }, {
+    "storeId": "5694076474456842308",
+    "role": "Follower"
+  }, {
+    "storeId": "7111541207686793717",
+    "role": "Follower"
+  }],
+  "state": "PState_Warn"
+},{
+  "id": 1,
+  "version": "2",
+  "confVer": "1",
+  "shards": [{
+    "storeId": "5694076474456842308",
+    "role": "Follower"
+  }, {
+    "storeId": "7111541207686793717",
+    "role": "Leader"
+  }, {
+    "storeId": "4544463310588084737",
+    "role": "Follower"
+  }],
+  "state": "PState_Warn"
+},{
+  "id": 10,
+  "version": "1",
+  "confVer": "1",
+  "shards": [{
+    "storeId": "5694076474456842308",
+    "role": "Follower"
+  }, {
+    "storeId": "7111541207686793717",
+    "role": "Leader"
+  }, {
+    "storeId": "4544463310588084737",
+    "role": "Follower"
+  }],
+  "state": "PState_Warn"
+},{
+  "id": 11,
+  "version": "1",
+  "confVer": "1",
+  "shards": [{
+    "storeId": "7111541207686793717",
+    "role": "Follower"
+  }, {
+    "storeId": "4544463310588084737",
+    "role": "Leader"
+  }, {
+    "storeId": "5694076474456842308",
+    "role": "Follower"
+  }],
+  "state": "PState_Warn"
+},{
+  "id": 2,
+  "version": "2",
+  "confVer": "1",
+  "shards": [{
+    "storeId": "7111541207686793717",
+    "role": "Follower"
+  }, {
+    "storeId": "4544463310588084737",
+    "role": "Leader"
+  }, {
+    "storeId": "5694076474456842308",
+    "role": "Follower"
+  }],
+  "state": "PState_Warn"
+},{
+  "id": 3,
+  "version": "2",
+  "confVer": "1",
+  "shards": [{
+    "storeId": "4544463310588084737",
+    "role": "Follower"
+  }, {
+    "storeId": "5694076474456842308",
+    "role": "Follower"
+  }, {
+    "storeId": "7111541207686793717",
+    "role": "Leader"
+  }],
+  "state": "PState_Warn"
+},{
+  "id": 4,
+  "version": "1",
+  "confVer": "1",
+  "shards": [{
+    "storeId": "5694076474456842308",
+    "role": "Follower"
+  }, {
+    "storeId": "7111541207686793717",
+    "role": "Leader"
+  }, {
+    "storeId": "4544463310588084737",
+    "role": "Follower"
+  }],
+  "state": "PState_Warn"
+},{
+  "id": 5,
+  "version": "1",
+  "confVer": "1",
+  "shards": [{
+    "storeId": "7111541207686793717",
+    "role": "Follower"
+  }, {
+    "storeId": "4544463310588084737",
+    "role": "Leader"
+  }, {
+    "storeId": "5694076474456842308",
+    "role": "Follower"
+  }],
+  "state": "PState_Warn"
+},{
+  "id": 6,
+  "version": "1",
+  "confVer": "1",
+  "shards": [{
+    "storeId": "4544463310588084737",
+    "role": "Follower"
+  }, {
+    "storeId": "5694076474456842308",
+    "role": "Follower"
+  }, {
+    "storeId": "7111541207686793717",
+    "role": "Leader"
+  }],
+  "state": "PState_Warn"
+},{
+  "id": 7,
+  "version": "1",
+  "confVer": "1",
+  "shards": [{
+    "storeId": "5694076474456842308",
+    "role": "Follower"
+  }, {
+    "storeId": "7111541207686793717",
+    "role": "Follower"
+  }, {
+    "storeId": "4544463310588084737",
+    "role": "Leader"
+  }],
+  "state": "PState_Warn"
+},{
+  "id": 8,
+  "version": "2",
+  "confVer": "1",
+  "shards": [{
+    "storeId": "7111541207686793717",
+    "role": "Leader"
+  }, {
+    "storeId": "4544463310588084737",
+    "role": "Follower"
+  }, {
+    "storeId": "5694076474456842308",
+    "role": "Follower"
+  }],
+  "state": "PState_Warn"
+},{
+  "id": 9,
+  "version": "2",
+  "confVer": "1",
+  "shards": [{
+    "storeId": "4544463310588084737",
+    "role": "Leader"
+  }, {
+    "storeId": "5694076474456842308",
+    "role": "Follower"
+  }, {
+    "storeId": "7111541207686793717",
+    "role": "Follower"
+  }],
+  "state": "PState_Warn"
+}]}

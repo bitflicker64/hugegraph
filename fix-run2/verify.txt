@@ -1,0 +1,2 @@
+run=s2bfix vertex_attempts=1492 vertex_acked=1492 vertex_failed=0 edge_acked=1490 verified_ok=2982 missing=0
+gremlin_total_lifemark count=10506 (all runs; this run acked=1492)

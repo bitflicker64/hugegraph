@@ -1,0 +1,1332 @@
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - updateStore storeId: 474781195076745201, address: hugegraph-store-2.hugegraph-store.hg.svc:8500, state: Tombstone
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - updateStore removeActiveStores store 474781195076745201
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 0, add shards from 2 to 3
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - fireChangeShard partition: DEFAULT/hugegraph/g-0, changeType: CONF_CHANGE_TYPE_ADJUST [store_id: 5577637160483286959
+role: Leader
+, store_id: 1537869751521905968
+role: Follower
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 0, shards: [store_id: 5577637160483286959
+role: Leader
+, store_id: 1537869751521905968
+role: Follower
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 1, add shards from 2 to 3
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - fireChangeShard partition: DEFAULT/hugegraph/g-1, changeType: CONF_CHANGE_TYPE_ADJUST [store_id: 5577637160483286959
+role: Leader
+, store_id: 1537869751521905968
+role: Follower
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 1, shards: [store_id: 5577637160483286959
+role: Leader
+, store_id: 1537869751521905968
+role: Follower
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 10, add shards from 2 to 3
+2026-09-24 07:14:03 [hg-grpc-2-thread-517] [INFO] o.a.h.p.n.NoticeBroadcaster - Removing NoticeBroadcaster is stating, noticeId:1790234043267, durableId: 1790234043264
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - fireChangeShard partition: DEFAULT/hugegraph/g-10, changeType: CONF_CHANGE_TYPE_ADJUST [store_id: 5577637160483286959
+role: Follower
+, store_id: 1537869751521905968
+role: Leader
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [hg-grpc-2-thread-521] [INFO] o.a.h.p.n.NoticeBroadcaster - Removing NoticeBroadcaster is stating, noticeId:1790234043281, durableId: 1790234043277
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 10, shards: [store_id: 5577637160483286959
+role: Follower
+, store_id: 1537869751521905968
+role: Leader
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 11, add shards from 2 to 3
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - fireChangeShard partition: DEFAULT/hugegraph/g-11, changeType: CONF_CHANGE_TYPE_ADJUST [store_id: 1537869751521905968
+role: Follower
+, store_id: 5577637160483286959
+role: Leader
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [hg-grpc-2-thread-518] [INFO] o.a.h.p.n.NoticeBroadcaster - Removing NoticeBroadcaster is stating, noticeId:1790234043295, durableId: 1790234043290
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 11, shards: [store_id: 1537869751521905968
+role: Follower
+, store_id: 5577637160483286959
+role: Leader
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 2, add shards from 2 to 3
+2026-09-24 07:14:03 [hg-grpc-2-thread-516] [INFO] o.a.h.p.n.NoticeBroadcaster - Removing NoticeBroadcaster is stating, noticeId:1790234043311, durableId: 1790234043306
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - fireChangeShard partition: DEFAULT/hugegraph/g-2, changeType: CONF_CHANGE_TYPE_ADJUST [store_id: 1537869751521905968
+role: Leader
+, store_id: 5577637160483286959
+role: Follower
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 2, shards: [store_id: 1537869751521905968
+role: Leader
+, store_id: 5577637160483286959
+role: Follower
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 3, add shards from 2 to 3
+2026-09-24 07:14:03 [hg-grpc-2-thread-522] [INFO] o.a.h.p.n.NoticeBroadcaster - Removing NoticeBroadcaster is stating, noticeId:1790234043329, durableId: 1790234043323
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - fireChangeShard partition: DEFAULT/hugegraph/g-3, changeType: CONF_CHANGE_TYPE_ADJUST [store_id: 5577637160483286959
+role: Follower
+, store_id: 1537869751521905968
+role: Leader
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 3, shards: [store_id: 5577637160483286959
+role: Follower
+, store_id: 1537869751521905968
+role: Leader
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 4, add shards from 2 to 3
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - fireChangeShard partition: DEFAULT/hugegraph/g-4, changeType: CONF_CHANGE_TYPE_ADJUST [store_id: 5577637160483286959
+role: Leader
+, store_id: 1537869751521905968
+role: Follower
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [hg-grpc-2-thread-513] [INFO] o.a.h.p.n.NoticeBroadcaster - Removing NoticeBroadcaster is stating, noticeId:1790234043345, durableId: 1790234043340
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 4, shards: [store_id: 5577637160483286959
+role: Leader
+, store_id: 1537869751521905968
+role: Follower
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 5, add shards from 2 to 3
+2026-09-24 07:14:03 [hg-grpc-2-thread-515] [INFO] o.a.h.p.n.NoticeBroadcaster - Removing NoticeBroadcaster is stating, noticeId:1790234043362, durableId: 1790234043355
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - fireChangeShard partition: DEFAULT/hugegraph/g-5, changeType: CONF_CHANGE_TYPE_ADJUST [store_id: 1537869751521905968
+role: Follower
+, store_id: 5577637160483286959
+role: Leader
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 5, shards: [store_id: 1537869751521905968
+role: Follower
+, store_id: 5577637160483286959
+role: Leader
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 6, add shards from 2 to 3
+2026-09-24 07:14:03 [hg-grpc-2-thread-524] [INFO] o.a.h.p.n.NoticeBroadcaster - Removing NoticeBroadcaster is stating, noticeId:1790234043376, durableId: 1790234043372
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - fireChangeShard partition: DEFAULT/hugegraph/g-6, changeType: CONF_CHANGE_TYPE_ADJUST [store_id: 5577637160483286959
+role: Leader
+, store_id: 1537869751521905968
+role: Follower
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 6, shards: [store_id: 5577637160483286959
+role: Leader
+, store_id: 1537869751521905968
+role: Follower
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 7, add shards from 2 to 3
+2026-09-24 07:14:03 [hg-grpc-2-thread-525] [INFO] o.a.h.p.n.NoticeBroadcaster - Removing NoticeBroadcaster is stating, noticeId:1790234043392, durableId: 1790234043387
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - fireChangeShard partition: DEFAULT/hugegraph/g-7, changeType: CONF_CHANGE_TYPE_ADJUST [store_id: 5577637160483286959
+role: Follower
+, store_id: 1537869751521905968
+role: Leader
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 7, shards: [store_id: 5577637160483286959
+role: Follower
+, store_id: 1537869751521905968
+role: Leader
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 8, add shards from 2 to 3
+2026-09-24 07:14:03 [hg-grpc-2-thread-520] [INFO] o.a.h.p.n.NoticeBroadcaster - Removing NoticeBroadcaster is stating, noticeId:1790234043407, durableId: 1790234043401
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - fireChangeShard partition: DEFAULT/hugegraph/g-8, changeType: CONF_CHANGE_TYPE_ADJUST [store_id: 1537869751521905968
+role: Follower
+, store_id: 5577637160483286959
+role: Leader
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 8, shards: [store_id: 1537869751521905968
+role: Follower
+, store_id: 5577637160483286959
+role: Leader
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 9, add shards from 2 to 3
+2026-09-24 07:14:03 [hg-grpc-2-thread-523] [INFO] o.a.h.p.n.NoticeBroadcaster - Removing NoticeBroadcaster is stating, noticeId:1790234043423, durableId: 1790234043419
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - fireChangeShard partition: DEFAULT/hugegraph/g-9, changeType: CONF_CHANGE_TYPE_ADJUST [store_id: 5577637160483286959
+role: Leader
+, store_id: 1537869751521905968
+role: Follower
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - reallocShards ShardGroup 9, shards: [store_id: 5577637160483286959
+role: Leader
+, store_id: 1537869751521905968
+role: Follower
+, store_id: 239294855241425130
+]
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.StoreNodeService - onStoreStatusChanged storeId = 474781195076745201 from Up to Tombstone
+2026-09-24 07:14:03 [qtp858423246-23] [INFO] o.a.h.p.PartitionService - storeOffline store id: 474781195076745201, address: hugegraph-store-2.hugegraph-store.hg.svc:8500, state: Up
+2026-09-24 07:14:03 [hg-grpc-2-thread-530] [INFO] o.a.h.p.n.NoticeBroadcaster - Removing NoticeBroadcaster is stating, noticeId:1790234043436, durableId: 1790234043432
+2026-09-24 07:14:03 [hg-grpc-2-thread-18] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 3, from id: 3
+version: 2
+conf_ver: 1
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+}
+state: PState_Warn
+ to id: 3
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-18] [INFO] o.a.h.p.StoreNodeService - Raft 3 updateShardGroup id: 3
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-20] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 7, from id: 7
+version: 2
+conf_ver: 1
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+}
+state: PState_Warn
+ to id: 7
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-20] [INFO] o.a.h.p.StoreNodeService - Raft 7 updateShardGroup id: 7
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-15] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 2, from id: 2
+version: 2
+conf_ver: 1
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+}
+state: PState_Warn
+ to id: 2
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-15] [INFO] o.a.h.p.StoreNodeService - Raft 2 updateShardGroup id: 2
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-19] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 10, from id: 10
+version: 1
+conf_ver: 1
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+}
+state: PState_Warn
+ to id: 10
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-19] [INFO] o.a.h.p.StoreNodeService - Raft 10 updateShardGroup id: 10
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-35] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 1, from id: 1
+version: 1
+conf_ver: 1
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+}
+state: PState_Warn
+ to id: 1
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-35] [INFO] o.a.h.p.StoreNodeService - Raft 1 updateShardGroup id: 1
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-34] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 4, from id: 4
+version: 1
+conf_ver: 1
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+}
+state: PState_Warn
+ to id: 4
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-34] [INFO] o.a.h.p.StoreNodeService - Raft 4 updateShardGroup id: 4
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-29] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 11, from id: 11
+version: 2
+conf_ver: 1
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+}
+state: PState_Warn
+ to id: 11
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-29] [INFO] o.a.h.p.StoreNodeService - Raft 11 updateShardGroup id: 11
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-22] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 0, from version: 1
+conf_ver: 1
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+}
+state: PState_Warn
+ to conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-22] [INFO] o.a.h.p.StoreNodeService - Raft 0 updateShardGroup conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-33] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 9, from id: 9
+version: 2
+conf_ver: 1
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+}
+state: PState_Warn
+ to id: 9
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-33] [INFO] o.a.h.p.StoreNodeService - Raft 9 updateShardGroup id: 9
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-38] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 6, from id: 6
+version: 1
+conf_ver: 1
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+}
+state: PState_Warn
+ to id: 6
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-38] [INFO] o.a.h.p.StoreNodeService - Raft 6 updateShardGroup id: 6
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-50] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 8, from id: 8
+version: 2
+conf_ver: 1
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+}
+state: PState_Warn
+ to id: 8
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-50] [INFO] o.a.h.p.StoreNodeService - Raft 8 updateShardGroup id: 8
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-60] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 5, from id: 5
+version: 1
+conf_ver: 1
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+}
+state: PState_Warn
+ to id: 5
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:03 [hg-grpc-2-thread-60] [INFO] o.a.h.p.StoreNodeService - Raft 5 updateShardGroup id: 5
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-58] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 0, from conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+ to version: 1
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-58] [INFO] o.a.h.p.StoreNodeService - Raft 0 updateShardGroup version: 1
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-58] [INFO] o.a.h.p.m.PartitionMeta - updateGraph graph_name: "DEFAULT/hugegraph/g"
+partition_count: 12
+state: PState_Normal
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-58] [INFO] o.a.h.p.m.PartitionMeta - updateGraph graph_name: "DEFAULT/~sys_graph/g"
+partition_count: 12
+state: PState_Normal
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-58] [INFO] o.a.h.p.m.PartitionMeta - updateGraph graph_name: "DEFAULT/~sys_graph/m"
+partition_count: 1
+state: PState_Normal
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-58] [INFO] o.a.h.p.StoreNodeService - update cluster state: Cluster_Warn
+2026-09-24 07:14:04 [hg-grpc-2-thread-56] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 1, from id: 1
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+ to id: 1
+version: 1
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-56] [INFO] o.a.h.p.StoreNodeService - Raft 1 updateShardGroup id: 1
+version: 1
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-64] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 4, from id: 4
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+ to id: 4
+version: 1
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-64] [INFO] o.a.h.p.StoreNodeService - Raft 4 updateShardGroup id: 4
+version: 1
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-65] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 5, from id: 5
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+ to id: 5
+version: 1
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-65] [INFO] o.a.h.p.StoreNodeService - Raft 5 updateShardGroup id: 5
+version: 1
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-63] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 6, from id: 6
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+ to id: 6
+version: 1
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-63] [INFO] o.a.h.p.StoreNodeService - Raft 6 updateShardGroup id: 6
+version: 1
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-62] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 8, from id: 8
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+ to id: 8
+version: 2
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-62] [INFO] o.a.h.p.StoreNodeService - Raft 8 updateShardGroup id: 8
+version: 2
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-66] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 9, from id: 9
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+ to id: 9
+version: 2
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-66] [INFO] o.a.h.p.StoreNodeService - Raft 9 updateShardGroup id: 9
+version: 2
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-61] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 11, from id: 11
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+ to id: 11
+version: 2
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:04 [hg-grpc-2-thread-61] [INFO] o.a.h.p.StoreNodeService - Raft 11 updateShardGroup id: 11
+version: 2
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Follower
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:05 [hg-grpc-2-thread-68] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 2, from id: 2
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+state: PState_Warn
+ to id: 2
+version: 2
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:05 [hg-grpc-2-thread-68] [INFO] o.a.h.p.StoreNodeService - Raft 2 updateShardGroup id: 2
+version: 2
+conf_ver: 2
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:05 [hg-grpc-2-thread-69] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 3, from id: 3
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+state: PState_Warn
+ to id: 3
+version: 2
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:05 [hg-grpc-2-thread-69] [INFO] o.a.h.p.StoreNodeService - Raft 3 updateShardGroup id: 3
+version: 2
+conf_ver: 2
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+state: PState_Warn
+
+2026-09-24 07:14:05 [hg-grpc-2-thread-72] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 7, from id: 7
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+ to id: 7
+version: 2
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:05 [hg-grpc-2-thread-72] [INFO] o.a.h.p.StoreNodeService - Raft 7 updateShardGroup id: 7
+version: 2
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:05 [hg-grpc-2-thread-67] [INFO] o.a.h.p.StoreNodeService - onShardGroupStatusChanged, groupId: 10, from id: 10
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+ to id: 10
+version: 1
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:05 [hg-grpc-2-thread-67] [INFO] o.a.h.p.StoreNodeService - Raft 10 updateShardGroup id: 10
+version: 1
+conf_ver: 2
+shards {
+  store_id: 5577637160483286959
+  role: Follower
+}
+shards {
+  store_id: 1537869751521905968
+  role: Leader
+}
+shards {
+  store_id: 239294855241425130
+  role: Follower
+}
+state: PState_Warn
+
+2026-09-24 07:14:05 [hg-grpc-2-thread-67] [INFO] o.a.h.p.StoreNodeService - update cluster state: Cluster_OK

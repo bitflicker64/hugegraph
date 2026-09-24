@@ -1,0 +1,13 @@
+pd:     { image: { repository: hg3227/pd,     tag: "fix3", pullPolicy: IfNotPresent } }
+store:  { image: { repository: hg3227/store,  tag: "fix3", pullPolicy: IfNotPresent } }
+server: { image: { repository: hg3227/server, tag: "fix3", pullPolicy: IfNotPresent } }
+hubble: { enabled: true, image: { repository: hg3227/hubble, tag: control, pullPolicy: IfNotPresent } }
+networkPolicy:
+  server:
+    extraIngress:
+      - from: [ { podSelector: { matchLabels: { hg3227/role: probe } } } ]
+        ports: [ { protocol: TCP, port: 8080 } ]
+  store:
+    extraIngress:
+      - from: [ { podSelector: { matchLabels: { hg3227/role: probe } } } ]
+        ports: [ { protocol: TCP, port: 8520 } ]

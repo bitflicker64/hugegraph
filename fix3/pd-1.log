@@ -1,0 +1,10 @@
+2026-09-24 13:12:08 [hg-u-job-1-1] [INFO] o.a.h.p.r.RaftStateMachine - start snapshot save
+2026-09-24 13:12:08 [hg-u-job-1-1] [INFO] o.a.h.p.s.HgKVStoreImpl - begin save snapshot at /hugegraph-pd/pd_data/pd_raft/snapshot/temp/snapshot
+2026-09-24 13:12:08 [hg-u-job-1-1] [INFO] o.a.h.p.s.HgKVStoreImpl - saved snapshot into /hugegraph-pd/pd_data/pd_raft/snapshot/temp/snapshot
+2026-09-24 13:12:08 [hg-u-job-1-1] [INFO] o.a.h.p.r.RaftStateMachine - Raft onSnapshotSave success
+2026-09-24 13:12:08 [hg-u-job-1-1] [INFO] o.a.h.p.r.RaftStateMachine - snapshot save done
+2026-09-24 13:17:08 [hg-u-job-1-1] [INFO] o.a.h.p.r.RaftStateMachine - start snapshot save
+2026-09-24 13:17:08 [hg-u-job-1-1] [INFO] o.a.h.p.s.HgKVStoreImpl - begin save snapshot at /hugegraph-pd/pd_data/pd_raft/snapshot/temp/snapshot
+2026-09-24 13:17:08 [hg-u-job-1-1] [INFO] o.a.h.p.s.HgKVStoreImpl - saved snapshot into /hugegraph-pd/pd_data/pd_raft/snapshot/temp/snapshot
+2026-09-24 13:17:08 [hg-u-job-1-1] [INFO] o.a.h.p.r.RaftStateMachine - Raft onSnapshotSave success
+2026-09-24 13:17:08 [hg-u-job-1-1] [INFO] o.a.h.p.r.RaftStateMachine - snapshot save done

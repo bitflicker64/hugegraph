@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 860" width="1300" height="860">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b91c1c"/>
+    </marker>
+    <marker id="arrGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#15803d"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1300" height="860" fill="#ffffff"/>
+  <g font-family="Helvetica Neue, Helvetica, Arial, sans-serif" fill="#0f172a">
+    <text x="650" y="40" text-anchor="middle" font-size="24" font-weight="bold">#3227: what the Store leader does with PD's ChangeShard, before and after</text>
+
+    <!-- shared input -->
+    <rect x="290" y="62" width="720" height="80" rx="8" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+    <text x="650" y="93" text-anchor="middle" font-size="19">PD, after Tombstone of X + patrolPartitions: group N = [S0, S1, Y]</text>
+    <text x="650" y="121" text-anchor="middle" font-size="19">ChangeShard to the group leader. Y and X share raft address a2.</text>
+    <line x1="470" y1="142" x2="335" y2="186" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="830" y1="142" x2="965" y2="186" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- column headers -->
+    <text x="335" y="212" text-anchor="middle" font-size="21" font-weight="bold" fill="#b91c1c">Before: master 83ef9f3</text>
+    <text x="965" y="212" text-anchor="middle" font-size="21" font-weight="bold" fill="#15803d">After: this PR (9b6bf414)</text>
+
+    <!-- BEFORE column -->
+    <rect x="40" y="228" width="590" height="84" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="60" y="262" font-size="19">changePeers: ids map to endpoints [a0, a1, a2],</text>
+    <text x="60" y="290" font-size="19">the same as the raft conf, so nothing is added</text>
+    <line x1="335" y1="312" x2="335" y2="334" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+
+    <rect x="40" y="336" width="590" height="84" rx="8" fill="#fef2f2" stroke="#b91c1c" stroke-width="1.5"/>
+    <text x="60" y="370" font-size="19">store-2 never gets a raft node for group N,</text>
+    <text x="60" y="398" font-size="19">so no snapshot; replicator to a2 stays OFFLINE</text>
+    <line x1="335" y1="420" x2="335" y2="442" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+
+    <rect x="40" y="444" width="590" height="84" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="60" y="478" font-size="19">Leader's local shard group still says</text>
+    <text x="60" y="506" font-size="19">[S0, S1, X]: nothing ever rewrites it</text>
+    <line x1="335" y1="528" x2="335" y2="550" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+
+    <rect x="40" y="552" width="590" height="84" rx="8" fill="#fef2f2" stroke="#b91c1c" stroke-width="1.5"/>
+    <text x="60" y="586" font-size="19">Partition heartbeat (every 5 s) sends [S0, S1, X];</text>
+    <text x="60" y="614" font-size="19">PD overwrites its corrected group with it</text>
+    <path d="M 40 594 L 18 594 L 18 102 L 282 102" fill="none" stroke="#b91c1c" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#arrRed)"/>
+    <line x1="335" y1="636" x2="335" y2="668" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+
+    <rect x="40" y="670" width="590" height="150" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="2.5"/>
+    <text x="335" y="703" text-anchor="middle" font-size="20" font-weight="bold" fill="#b91c1c">After 1501 s (control run)</text>
+    <text x="60" y="738" font-size="19">12 of 12 groups name the retired id X</text>
+    <text x="60" y="766" font-size="19">store-2: HTTP 500 on all 12 groups, 38 MB of data</text>
+    <text x="60" y="794" font-size="19">PD still reports Cluster_OK, 3 Stores Up</text>
+
+    <!-- AFTER column -->
+    <rect x="670" y="228" width="590" height="84" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="690" y="262" font-size="19">Same endpoints, but PD names Y at a2 where</text>
+    <text x="690" y="290" font-size="19">the local group has X: store id changed</text>
+    <line x1="965" y1="312" x2="965" y2="334" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+
+    <rect x="670" y="336" width="590" height="84" rx="8" fill="#f0fdf4" stroke="#15803d" stroke-width="1.5"/>
+    <text x="690" y="370" font-size="19">createRaftNode(a2, current conf): store-2 creates</text>
+    <text x="690" y="398" font-size="19">the node, jraft installs the leader's snapshot</text>
+    <line x1="965" y1="420" x2="965" y2="442" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+
+    <rect x="670" y="444" width="590" height="84" rx="8" fill="#f0fdf4" stroke="#15803d" stroke-width="1.5"/>
+    <text x="690" y="478" font-size="19">Local shard group becomes [S0, S1, Y], reported</text>
+    <text x="690" y="506" font-size="19">to PD; the heartbeat now sends Y, not X</text>
+    <line x1="965" y1="528" x2="965" y2="550" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+
+    <rect x="670" y="552" width="590" height="84" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="690" y="586" font-size="19">Wait until the replicator to a2 is in Replicate,</text>
+    <text x="690" y="614" font-size="19">then doChangeShard returns OK. No conf change.</text>
+    <line x1="965" y1="636" x2="965" y2="668" stroke="#334155" stroke-width="2" marker-end="url(#arrGreen)"/>
+
+    <rect x="670" y="670" width="590" height="150" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="2.5"/>
+    <text x="965" y="703" text-anchor="middle" font-size="20" font-weight="bold" fill="#15803d">First sample: 1 s (run 1), 17 s (run 2)</text>
+    <text x="690" y="738" font-size="19">0 groups name X, 12 of 12 name Y</text>
+    <text x="690" y="766" font-size="19">store-2: HTTP 200 on all 12 groups, 242 MB</text>
+    <text x="690" y="794" font-size="19">Cluster_OK, store-2 partitionCount 12 (from 48 s)</text>
+  </g>
+</svg>

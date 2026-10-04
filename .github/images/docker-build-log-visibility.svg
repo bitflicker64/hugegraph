@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 640" width="1300" height="640" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444444"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1300" height="640" fill="#ffffff"/>
+
+  <!-- Column titles -->
+  <text x="325" y="52" text-anchor="middle" font-size="26" font-weight="bold" fill="#b42318">Before: docker build -q</text>
+  <text x="975" y="52" text-anchor="middle" font-size="26" font-weight="bold" fill="#067647">After: --progress=plain --iidfile</text>
+  <line x1="650" y1="24" x2="650" y2="616" stroke="#d0d5dd" stroke-width="2" stroke-dasharray="8 6"/>
+
+  <!-- BEFORE column -->
+  <rect x="60" y="88" width="530" height="96" rx="10" fill="#f2f4f7" stroke="#98a2b3" stroke-width="2"/>
+  <text x="325" y="128" text-anchor="middle" font-size="21" fill="#101828">Build stage: mvn install fails</text>
+  <text x="325" y="160" text-anchor="middle" font-size="19" fill="#475467">(e.g. a dependency download error)</text>
+
+  <line x1="325" y1="184" x2="325" y2="236" stroke="#444444" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="340" y="217" font-size="18" fill="#475467">Maven output</text>
+
+  <rect x="60" y="240" width="530" height="96" rx="10" fill="#fef3f2" stroke="#d92d20" stroke-width="2"/>
+  <text x="325" y="280" text-anchor="middle" font-size="21" fill="#101828">-q discards the build log</text>
+  <text x="325" y="312" text-anchor="middle" font-size="19" fill="#475467">stdout carries only the image ID</text>
+
+  <line x1="325" y1="336" x2="325" y2="388" stroke="#444444" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="340" y="369" font-size="18" fill="#475467">what the job log shows</text>
+
+  <rect x="60" y="392" width="530" height="190" rx="10" fill="#1d2939" stroke="#1d2939" stroke-width="2"/>
+  <text x="84" y="432" font-size="18" font-family="Menlo, Consolas, monospace" fill="#f2f4f7">Dockerfile:31</text>
+  <text x="84" y="464" font-size="18" font-family="Menlo, Consolas, monospace" fill="#f2f4f7">&gt;&gt;&gt; RUN ... mvn install ...</text>
+  <text x="84" y="496" font-size="18" font-family="Menlo, Consolas, monospace" fill="#fda29b">ERROR: failed to solve:</text>
+  <text x="84" y="528" font-size="18" font-family="Menlo, Consolas, monospace" fill="#fda29b">... exit code: 1</text>
+  <text x="84" y="562" font-size="18" fill="#fecdca">No reason. Cause cannot be found.</text>
+
+  <!-- AFTER column -->
+  <rect x="710" y="88" width="530" height="96" rx="10" fill="#f2f4f7" stroke="#98a2b3" stroke-width="2"/>
+  <text x="975" y="128" text-anchor="middle" font-size="21" fill="#101828">Build stage: mvn install fails</text>
+  <text x="975" y="160" text-anchor="middle" font-size="19" fill="#475467">(same failure)</text>
+
+  <line x1="975" y1="184" x2="975" y2="236" stroke="#444444" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="990" y="217" font-size="18" fill="#475467">Maven output</text>
+
+  <rect x="710" y="240" width="530" height="96" rx="10" fill="#ecfdf3" stroke="#17b26a" stroke-width="2"/>
+  <text x="975" y="280" text-anchor="middle" font-size="21" fill="#101828">--progress=plain prints every line</text>
+  <text x="975" y="312" text-anchor="middle" font-size="19" fill="#475467">image ID goes to $RUNNER_TEMP/iid</text>
+
+  <line x1="975" y1="336" x2="975" y2="388" stroke="#444444" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="990" y="369" font-size="18" fill="#475467">what the job log shows (example)</text>
+
+  <rect x="710" y="392" width="530" height="190" rx="10" fill="#1d2939" stroke="#1d2939" stroke-width="2"/>
+  <text x="734" y="432" font-size="18" font-family="Menlo, Consolas, monospace" fill="#f2f4f7">#9 12.4 [ERROR] Failed to execute</text>
+  <text x="734" y="464" font-size="18" font-family="Menlo, Consolas, monospace" fill="#f2f4f7">#9 12.4 ... Could not transfer</text>
+  <text x="734" y="496" font-size="18" font-family="Menlo, Consolas, monospace" fill="#f2f4f7">#9 12.4 artifact ... from central</text>
+  <text x="734" y="528" font-size="18" font-family="Menlo, Consolas, monospace" fill="#fda29b">ERROR: ... exit code: 1</text>
+  <text x="734" y="562" font-size="18" fill="#a6f4c5">The Maven error is right above it.</text>
+
+  <text x="650" y="622" text-anchor="middle" font-size="17" fill="#667085">IMAGE_ID, the HEALTHCHECK check and later steps work the same way in both.</text>
+</svg>

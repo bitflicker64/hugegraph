@@ -1,0 +1,682 @@
+<!doctype html>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements. See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License. You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!--
+  Intro video for hugegraph-pd. Every frame is a pure function of the time t:
+  call renderAt(t) with t in seconds. Open the page with ?t=12.5 to see one
+  frame, or ?play to watch it in real time. render.cjs records it frame by frame.
+  The TIMELINE block is written by build.py from the narration's audio timings.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HugeGraph PD intro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;600&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07090d; --text: #e8edf3; --dim: #7d8a99; --line: #26303c;
+    --pd: #4fd1c5; --store: #7fd17a; --server: #a78bfa; --lead: #f5b942; --bad: #ef6b6b;
+  }
+  html, body { margin: 0; background: var(--bg); width: 1920px; height: 1080px; overflow: hidden; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg);
+           font-family: Inter, system-ui, sans-serif; color: var(--text); }
+  svg { position: absolute; left: 0; top: 0; }
+  .ov { position: absolute; left: 0; width: 1920px; text-align: center; will-change: opacity, transform; }
+  .ov span { display: inline-block; white-space: pre; }
+  #title { top: 360px; font: 800 176px/1 Inter, sans-serif; letter-spacing: -5px; }
+  #tag { top: 585px; font: 600 30px/1 'JetBrains Mono', monospace; letter-spacing: 9px; color: var(--pd); }
+  #tag2 { top: 650px; font: 400 32px/1 Inter, sans-serif; color: #9aa5b1; word-spacing: 4px; }
+  #tag2 span { margin: 0 14px; }
+  #end1 { top: 400px; font: 800 132px/1 Inter, sans-serif; letter-spacing: -4px; }
+  #end2 { top: 572px; font: 400 32px/1 'JetBrains Mono', monospace; color: var(--dim); }
+  #end3 { top: 630px; font: 400 28px/1 Inter, sans-serif; color: #9aa5b1; }
+  #cap { position: absolute; left: 220px; right: 220px; bottom: 64px; height: 120px; display: flex;
+         align-items: flex-end; justify-content: center; text-align: center;
+         font: 500 40px/1.38 Inter, sans-serif; letter-spacing: -0.2px;
+         text-shadow: 0 0 14px #07090d, 0 0 6px #07090d, 0 0 2px #07090d; }
+  #cap div { position: absolute; bottom: 0; left: 0; right: 0; }
+  #cap span { white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="svg" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
+  <div id="title" class="ov"></div>
+  <div id="tag" class="ov">PLACEMENT DRIVER</div>
+  <div id="tag2" class="ov"><span>metadata</span>&middot;<span>partitions</span>&middot;<span>store health</span>&middot;<span>Raft</span></div>
+  <div id="end1" class="ov">HugeGraph <span style="color:var(--pd)">PD</span></div>
+  <div id="end2" class="ov">apache/hugegraph &middot; hugegraph-pd</div>
+  <div id="end3" class="ov">Placement Driver for distributed HugeGraph</div>
+  <div id="cap"></div>
+</div>
+<script>
+const TL = /*TIMELINE*/{"total":59.825,"outro":1.6,"scenes":[{"id":"intro","title":"HugeGraph PD","start":0.3,"voiceEnd":6.9,"end":7.3,"lines":[[{"t":"This","start":0.525,"end":0.7},{"t":"is","start":0.7,"end":0.862},{"t":"HugeGraph","start":0.862,"end":1.5},{"t":"PD,","start":1.5,"end":2.15},{"t":"the","start":2.275,"end":2.375},{"t":"Placement","start":2.375,"end":2.825},{"t":"Driver:","start":2.825,"end":3.55},{"t":"the","start":3.675,"end":3.775},{"t":"control","start":3.775,"end":4.25},{"t":"plane","start":4.25,"end":4.6},{"t":"of","start":4.6,"end":4.688},{"t":"a","start":4.688,"end":4.75},{"t":"distributed","start":4.75,"end":5.4},{"t":"HugeGraph","start":5.4,"end":5.975},{"t":"cluster.","start":5.975,"end":6.65}]]},{"id":"roles","title":"Three roles","start":7.3,"voiceEnd":16.325,"end":16.725,"lines":[[{"t":"Servers","start":7.55,"end":7.975},{"t":"run","start":7.975,"end":8.2},{"t":"graph","start":8.2,"end":8.5},{"t":"queries.","start":8.5,"end":9.175}],[{"t":"Stores","start":9.3,"end":9.725},{"t":"hold","start":9.725,"end":9.963},{"t":"the","start":9.963,"end":10.05},{"t":"graph","start":10.05,"end":10.375},{"t":"data.","start":10.375,"end":10.925}],[{"t":"PD","start":11.088,"end":11.6},{"t":"holds","start":11.6,"end":11.938},{"t":"only","start":11.938,"end":12.238},{"t":"the","start":12.238,"end":12.325},{"t":"metadata:","start":12.325,"end":13.05},{"t":"which","start":13.15,"end":13.35},{"t":"stores","start":13.35,"end":13.675},{"t":"are","start":13.675,"end":13.8},{"t":"alive,","start":13.8,"end":14.3},{"t":"and","start":14.375,"end":14.488},{"t":"where","start":14.488,"end":14.662},{"t":"every","start":14.662,"end":14.975},{"t":"partition","start":14.975,"end":15.475},{"t":"lives.","start":15.475,"end":16.075}]]},{"id":"partitions","title":"Partitions","start":16.725,"voiceEnd":26.675,"end":27.075,"lines":[[{"t":"Every","start":16.975,"end":17.262},{"t":"key","start":17.262,"end":17.537},{"t":"hashes","start":17.537,"end":17.975},{"t":"to","start":17.975,"end":18.075},{"t":"a","start":18.075,"end":18.187},{"t":"16-bit","start":18.187,"end":18.8},{"t":"code.","start":18.8,"end":19.5}],[{"t":"PD","start":19.663,"end":20.187},{"t":"splits","start":20.187,"end":20.6},{"t":"that","start":20.6,"end":20.8},{"t":"range","start":20.8,"end":21.137},{"t":"into","start":21.137,"end":21.325},{"t":"partitions,","start":21.325,"end":22.175},{"t":"and","start":22.25,"end":22.375},{"t":"places","start":22.375,"end":22.837},{"t":"each","start":22.837,"end":23.075},{"t":"partition's","start":23.075,"end":23.625},{"t":"replicas","start":23.625,"end":24.15},{"t":"on","start":24.15,"end":24.3},{"t":"different","start":24.3,"end":24.6},{"t":"stores,","start":24.6,"end":25.2},{"t":"one","start":25.313,"end":25.6},{"t":"as","start":25.6,"end":25.75},{"t":"the","start":25.75,"end":25.85},{"t":"leader.","start":25.85,"end":26.45}]]},{"id":"heartbeats","title":"Heartbeats","start":27.075,"voiceEnd":38.35,"end":38.75,"lines":[[{"t":"Stores","start":27.325,"end":27.675},{"t":"register","start":27.675,"end":28.15},{"t":"with","start":28.15,"end":28.337},{"t":"PD","start":28.337,"end":28.938},{"t":"and","start":28.938,"end":29.075},{"t":"send","start":29.075,"end":29.3},{"t":"heartbeats.","start":29.3,"end":30.175}],[{"t":"PD","start":30.312,"end":30.787},{"t":"answers","start":30.787,"end":31.237},{"t":"with","start":31.237,"end":31.362},{"t":"instructions:","start":31.362,"end":32.325},{"t":"move","start":32.425,"end":32.612},{"t":"a","start":32.612,"end":32.675},{"t":"partition,","start":32.675,"end":33.4},{"t":"split","start":33.513,"end":33.8},{"t":"it,","start":33.8,"end":34.05},{"t":"or","start":34.125,"end":34.275},{"t":"transfer","start":34.275,"end":34.713},{"t":"its","start":34.713,"end":34.875},{"t":"leader.","start":34.875,"end":35.5}],[{"t":"A","start":35.637,"end":35.75},{"t":"store","start":35.75,"end":36.013},{"t":"that","start":36.013,"end":36.125},{"t":"goes","start":36.125,"end":36.4},{"t":"quiet","start":36.4,"end":36.85},{"t":"is","start":36.85,"end":37.013},{"t":"marked","start":37.013,"end":37.325},{"t":"offline.","start":37.325,"end":38.125}]]},{"id":"raft","title":"Raft","start":38.75,"voiceEnd":50.275,"end":50.675,"lines":[[{"t":"PD","start":38.975,"end":39.325},{"t":"itself","start":39.325,"end":39.762},{"t":"runs","start":39.762,"end":40.163},{"t":"as","start":40.163,"end":40.363},{"t":"three","start":40.363,"end":40.65},{"t":"or","start":40.65,"end":40.788},{"t":"five","start":40.788,"end":41.125},{"t":"nodes","start":41.125,"end":41.487},{"t":"on","start":41.487,"end":41.688},{"t":"SOFA-JRaft.","start":41.688,"end":43.025}],[{"t":"Every","start":43.188,"end":43.5},{"t":"metadata","start":43.5,"end":44.025},{"t":"write","start":44.025,"end":44.325},{"t":"is","start":44.325,"end":44.438},{"t":"a","start":44.438,"end":44.525},{"t":"Raft","start":44.525,"end":44.825},{"t":"proposal,","start":44.825,"end":45.525},{"t":"saved","start":45.662,"end":46.05},{"t":"in","start":46.05,"end":46.2},{"t":"RocksDB.","start":46.2,"end":47.188}],[{"t":"If","start":47.188,"end":47.363},{"t":"the","start":47.363,"end":47.45},{"t":"leader","start":47.45,"end":47.75},{"t":"fails,","start":47.75,"end":48.4},{"t":"the","start":48.5,"end":48.65},{"t":"others","start":48.65,"end":49.025},{"t":"elect","start":49.025,"end":49.338},{"t":"a","start":49.338,"end":49.4},{"t":"new","start":49.4,"end":49.575},{"t":"one.","start":49.575,"end":50.05}]]},{"id":"routing","title":"Routing","start":50.675,"voiceEnd":58.225,"end":58.225,"lines":[[{"t":"Servers","start":50.925,"end":51.3},{"t":"ask","start":51.3,"end":51.587},{"t":"PD","start":51.587,"end":52.038},{"t":"where","start":52.038,"end":52.163},{"t":"a","start":52.163,"end":52.225},{"t":"key","start":52.225,"end":52.425},{"t":"lives,","start":52.425,"end":52.975},{"t":"cache","start":53.075,"end":53.363},{"t":"the","start":53.363,"end":53.475},{"t":"answer,","start":53.475,"end":54.05},{"t":"and","start":54.125,"end":54.25},{"t":"talk","start":54.25,"end":54.525},{"t":"to","start":54.525,"end":54.613},{"t":"that","start":54.613,"end":54.8},{"t":"store","start":54.8,"end":55.05},{"t":"directly.","start":55.05,"end":55.875}],[{"t":"PD","start":56.037,"end":56.513},{"t":"stays","start":56.513,"end":56.85},{"t":"out","start":56.85,"end":56.987},{"t":"of","start":56.987,"end":57.063},{"t":"the","start":57.063,"end":57.15},{"t":"data","start":57.15,"end":57.45},{"t":"path.","start":57.45,"end":58.0}]]}]}/*END*/;
+
+// ---------- helpers ----------
+const NS = 'http://www.w3.org/2000/svg';
+const SANS = 'Inter, sans-serif', MONO = "'JetBrains Mono', monospace";
+const C = { text: '#e8edf3', dim: '#7d8a99', line: '#26303c', pd: '#4fd1c5', store: '#7fd17a',
+            server: '#a78bfa', lead: '#f5b942', bad: '#ef6b6b', bg: '#07090d' };
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, k) => a + (b - a) * k;
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const P = (t, a, d = 0.6, e = eo) => e(clamp((t - a) / d));
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function set(e, attrs) { for (const k in attrs) e.setAttribute(k, attrs[k]); }
+// Small text is scaled up so it stays readable in GitHub's ~880 px wide player.
+const up = s => (s < 26 ? Math.round(s * 1.2) : s);
+function tx(parent, x, y, s, o = {}) {
+  const e = el('text', { x, y, 'text-anchor': o.anchor || 'middle', fill: o.fill || C.text,
+    'font-family': o.family || SANS, 'font-size': up(o.size || 28), 'font-weight': o.weight || 500,
+    'letter-spacing': o.ls || 0 }, parent);
+  e.textContent = s;
+  return e;
+}
+function line(parent, x1, y1, x2, y2, o = {}) {
+  return el('line', { x1, y1, x2, y2, stroke: o.stroke || C.line, 'stroke-width': o.w || 2,
+    'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': o.dash || 1, 'stroke-dashoffset': 1 }, parent);
+}
+function drawLine(e, k) { set(e, { 'stroke-dashoffset': 1 - k, opacity: k > 0 ? 1 : 0 }); }
+function box(parent, o) {
+  const g = el('g', {}, parent);
+  const r = el('rect', { x: o.x - o.w / 2, y: o.y - o.h / 2, width: o.w, height: o.h, rx: o.r || 18,
+    fill: o.color, 'fill-opacity': 0, stroke: o.color, 'stroke-width': 2.5, pathLength: 1,
+    'stroke-dasharray': 1, 'stroke-dashoffset': 1 }, g);
+  const lab = tx(g, o.x, o.sub ? o.y - 2 : o.y + 11, o.label, { size: o.size || 32, weight: 700 });
+  const sub = o.sub ? tx(g, o.x, o.y + 32, o.sub, { size: 19, family: MONO, fill: o.color }) : null;
+  return Object.assign(o, { g, r, lab, sub,
+    show(k, fill = 0.07) {
+      set(r, { 'stroke-dashoffset': 1 - k, 'fill-opacity': fill * k });
+      set(lab, { opacity: clamp(k * 2 - 1) });
+      if (sub) set(sub, { opacity: clamp(k * 2 - 1.2) });
+      set(g, { opacity: k > 0 ? 1 : 0, transform: `translate(0 ${(1 - k) * 18})` });
+    } });
+}
+function chip(parent, label, color, o = {}) {
+  const g = el('g', { opacity: 0 }, parent);
+  const w = o.w || (label.length * up(o.size || 20) * 0.61 + 36), hgt = o.h || up(40);
+  const r = el('rect', { x: -w / 2, y: -hgt / 2, width: w, height: hgt, rx: hgt / 2,
+    fill: o.solid ? color : C.bg, stroke: color, 'stroke-width': 2 }, g);
+  const t = tx(g, 0, up(o.size || 20) * 0.36, label, { size: o.size || 20, family: MONO, weight: 600,
+    fill: o.solid ? C.bg : color });
+  return { g, r, t, w,
+    at(x, y, op = 1, s = 1) { set(g, { transform: `translate(${x} ${y}) scale(${s})`, opacity: op }); } };
+}
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+// Same function as PartitionUtils.calcHashcode in hg-pd-common.
+function calcHashcode(str) {
+  let hash = 2166136261 | 0;
+  for (const b of new TextEncoder().encode(str)) hash = Math.imul(hash ^ (b << 24 >> 24), 16777619);
+  hash = (hash + (hash << 13)) | 0; hash ^= hash >> 7; hash = (hash + (hash << 3)) | 0;
+  hash ^= hash >> 17; hash = (hash + (hash << 5)) | 0; hash &= 0xffff;
+  return hash === 0xffff ? 0xfffe : hash;
+}
+
+// ---------- timeline lookups ----------
+const SC = Object.fromEntries(TL.scenes.map(s => [s.id, s]));
+const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+function W(id, word, nth = 0) {          // start time of a caption word in a scene
+  let n = 0;
+  for (const l of SC[id].lines) for (const w of l) if (norm(w.t) === norm(word) && n++ === nth) return w.start;
+  throw new Error(`word ${word}#${nth} not in scene ${id}`);
+}
+function WE(id, word, nth = 0) {
+  let n = 0;
+  for (const l of SC[id].lines) for (const w of l) if (norm(w.t) === norm(word) && n++ === nth) return w.end;
+  throw new Error(`word ${word}#${nth} not in scene ${id}`);
+}
+
+// ---------- stage ----------
+const svg = document.getElementById('svg');
+const defs = el('defs', {}, svg);
+defs.innerHTML = `
+  <pattern id="dots" width="48" height="48" patternUnits="userSpaceOnUse">
+    <circle cx="2" cy="2" r="1.6" fill="#1a222c"/></pattern>
+  <radialGradient id="vig" cx="50%" cy="46%" r="70%">
+    <stop offset="55%" stop-color="#07090d" stop-opacity="0"/>
+    <stop offset="100%" stop-color="#07090d" stop-opacity="0.92"/></radialGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#4fd1c5" stop-opacity="0.22"/>
+    <stop offset="100%" stop-color="#4fd1c5" stop-opacity="0"/></radialGradient>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>`;
+const grid = el('rect', { x: -96, y: -96, width: 2112, height: 1272, fill: 'url(#dots)' }, svg);
+const glowBg = el('ellipse', { cx: 960, cy: 470, rx: 760, ry: 460, fill: 'url(#glow)' }, svg);
+const layers = {};
+for (const s of TL.scenes) layers[s.id] = el('g', { opacity: 0 }, svg);
+el('rect', { width: 1920, height: 1080, fill: 'url(#vig)', 'pointer-events': 'none' }, svg);
+const hud = el('g', {}, svg);
+const hudRepo = tx(hud, 80, 84, 'apache/hugegraph', { anchor: 'start', size: 22, family: MONO, fill: C.dim });
+const hudMod = tx(hud, 80, 116, 'hugegraph-pd', { anchor: 'start', size: 22, family: MONO, fill: C.pd, weight: 600 });
+const hudNum = tx(hud, 1840, 84, '', { anchor: 'end', size: 22, family: MONO, fill: C.dim });
+const hudName = tx(hud, 1840, 116, '', { anchor: 'end', size: 22, family: MONO, fill: C.text, weight: 600, ls: 3 });
+const progBg = el('rect', { x: 0, y: 0, width: 1920, height: 4, fill: '#121820' }, svg);
+const prog = el('rect', { x: 0, y: 0, width: 0, height: 4, fill: C.pd }, svg);
+
+// ---------- scene 1: intro ----------
+const S1 = {};
+(() => {
+  const g = layers.intro, rnd = mulberry(7);
+  S1.nodes = []; S1.links = [];
+  for (let i = 0; i < 22; i++) {
+    const a = i / 22 * Math.PI * 2 + rnd() * 0.25, rr = 430 + rnd() * 260;
+    const x = 960 + Math.cos(a) * rr * 1.25, y = 500 + Math.sin(a) * rr * 0.62;
+    S1.links.push(line(g, 960, 500, x, y, { stroke: '#18232e', w: 1.5 }));
+    S1.nodes.push({ c: el('circle', { cx: x, cy: y, r: 0, fill: 'none', stroke: i % 3 ? C.store : C.pd,
+      'stroke-width': 2 }, g), d: rnd() });
+  }
+  S1.ring = el('ellipse', { cx: 960, cy: 500, rx: 0, ry: 0, fill: 'none', stroke: C.pd, 'stroke-width': 1.5 }, g);
+  const title = document.getElementById('title');
+  const text = 'HugeGraph PD';
+  S1.letters = [...text].map((ch, i) => {
+    const s = document.createElement('span');
+    s.textContent = ch;
+    if (i >= 10) s.style.color = 'var(--pd)';
+    title.appendChild(s);
+    return s;
+  });
+  S1.tag = document.getElementById('tag');
+  S1.tag2 = [...document.querySelectorAll('#tag2 span')];
+  S1.tag2box = document.getElementById('tag2');
+  S1.render = t => {
+    const s = SC.intro, t0 = s.start;
+    S1.links.forEach((l, i) => drawLine(l, P(t, t0 + 0.4 + i * 0.05, 1.2, eio)));
+    S1.nodes.forEach((n, i) => {
+      const k = P(t, t0 + 0.9 + i * 0.05, 0.6, back);
+      set(n.c, { r: Math.max(0, k * (7 + 3 * Math.sin(t * 2.4 + n.d * 6))) });
+    });
+    const rk = ((t - t0) % 2.4) / 2.4;
+    set(S1.ring, { rx: 300 + rk * 520, ry: 150 + rk * 260, opacity: t > t0 ? (1 - rk) * 0.35 : 0 });
+    S1.letters.forEach((sp, i) => {
+      const k = P(t, t0 + 0.15 + i * 0.05, 0.8, back);
+      sp.style.opacity = clamp(k);
+      sp.style.transform = `translateY(${(1 - k) * 70}px)`;
+    });
+    const kt = P(t, W('intro', 'Placement') - 0.1, 0.7);
+    S1.tag.style.opacity = kt;
+    S1.tag.style.letterSpacing = `${lerp(24, 9, kt)}px`;
+    const kc = W('intro', 'control');
+    S1.tag2.forEach((sp, i) => {
+      const k = P(t, kc + i * 0.32, 0.6);
+      sp.style.opacity = k;
+      sp.style.transform = `translateY(${(1 - k) * 16}px)`;
+    });
+  };
+})();
+
+// ---------- scene 2: roles ----------
+const S2 = {};
+(() => {
+  const g = layers.roles;
+  const xs = [510, 960, 1410];
+  S2.lines = [];
+  const lg = el('g', {}, g);
+  S2.servers = xs.map(x => box(g, { x, y: 250, w: 360, h: 118, color: C.server, label: 'Server', sub: 'Gremlin · Cypher · REST' }));
+  S2.stores = xs.map(x => box(g, { x, y: 730, w: 360, h: 130, color: C.store, label: 'Store', sub: 'RocksDB · Raft' }));
+  S2.pd = box(g, { x: 960, y: 490, w: 780, h: 150, color: C.pd, label: '', size: 1 });
+  S2.pdLabel = tx(g, 690, 512, 'PD', { size: 64, weight: 800, fill: C.pd });
+  S2.meta1 = tx(g, 800, 476, 'stores    1 ● 2 ● 3 ●  alive', { anchor: 'start', size: 24, family: MONO, fill: C.text });
+  S2.meta2 = tx(g, 800, 520, 'partition → store', { anchor: 'start', size: 24, family: MONO, fill: C.text });
+  S2.meta3 = tx(g, 800, 556, 'metadata only', { anchor: 'start', size: 20, family: MONO, fill: C.dim });
+  xs.forEach(x => {
+    S2.lines.push(line(lg, x, 306, 960 + (x - 960) * 0.4, 415, { stroke: '#3a3260', w: 2 }));
+    S2.lines.push(line(lg, 960 + (x - 960) * 0.4, 565, x, 665, { stroke: '#1f4a47', w: 2 }));
+  });
+  // a tiny graph drawn inside each store: the graph data lives here
+  S2.graphs = xs.map((x, si) => {
+    const gg = el('g', { opacity: 0 }, g), rnd = mulberry(11 + si);
+    const pts = [...Array(6)].map((_, i) => [x - 110 + i * 44, 828 + (rnd() - 0.5) * 34]);
+    const edges = [];
+    for (let i = 1; i < pts.length; i++) edges.push(line(gg, ...pts[i - 1], ...pts[i], { stroke: C.store, w: 1.5 }));
+    edges.push(line(gg, ...pts[0], ...pts[3], { stroke: C.store, w: 1.5 }));
+    edges.push(line(gg, ...pts[2], ...pts[5], { stroke: C.store, w: 1.5 }));
+    const dots = pts.map(p => el('circle', { cx: p[0], cy: p[1], r: 0, fill: C.store }, gg));
+    return { gg, edges, dots };
+  });
+  S2.render = t => {
+    const s = SC.roles;
+    const tS = W('roles', 'Servers'), tSt = W('roles', 'Stores'), tPD = W('roles', 'PD');
+    S2.servers.forEach((b, i) => b.show(P(t, tS - 0.15 + i * 0.12, 0.7)));
+    S2.stores.forEach((b, i) => b.show(P(t, tSt - 0.15 + i * 0.12, 0.7)));
+    const tg = W('roles', 'graph', 1);
+    S2.graphs.forEach((gr, i) => {
+      const k = P(t, tg + i * 0.1, 0.8);
+      set(gr.gg, { opacity: k > 0 ? 1 : 0 });
+      gr.edges.forEach(e => drawLine(e, k));
+      gr.dots.forEach((d, j) => set(d, { r: 5 * P(t, tg + i * 0.1 + j * 0.06, 0.4, back) }));
+    });
+    const kp = P(t, tPD - 0.2, 0.8);
+    S2.pd.show(kp, 0.09);
+    set(S2.pdLabel, { opacity: kp, transform: `translate(0 ${(1 - kp) * 18})` });
+    S2.lines.forEach((l, i) => drawLine(l, P(t, tPD + 0.2 + i * 0.06, 0.6)));
+    const k1 = P(t, W('roles', 'which') - 0.1, 0.5), k2 = P(t, W('roles', 'where') - 0.1, 0.5);
+    set(S2.meta1, { opacity: k1, transform: `translate(${(1 - k1) * 24} 0)` });
+    set(S2.meta2, { opacity: k2, transform: `translate(${(1 - k2) * 24} 0)` });
+    set(S2.meta3, { opacity: P(t, W('roles', 'metadata'), 0.5) });
+  };
+})();
+
+// ---------- scene 3: partitions ----------
+const S3 = {};
+(() => {
+  const g = layers.partitions;
+  const KEY = 'marko', CODE = calcHashcode(KEY), NP = 4;
+  const X0 = 300, X1 = 1620, BY = 420;
+  S3.part = Math.floor(CODE / (0x10000 / NP));
+  S3.key = chip(g, `key "${KEY}"`, C.text, { size: 24 });
+  S3.hash = box(g, { x: 760, y: 250, w: 250, h: 84, color: C.pd, label: '', size: 1, r: 14 });
+  S3.hashT = tx(g, 760, 260, 'calcHashcode', { size: 26, family: MONO, fill: C.pd, weight: 600 });
+  S3.code = chip(g, `0x${CODE.toString(16).toUpperCase().padStart(4, '0')}`, C.lead, { size: 24 });
+  S3.bar = el('g', {}, g);
+  S3.segs = [...Array(NP)].map((_, i) => el('rect', { x: 0, y: BY - 22, width: 0, height: 44, rx: 10,
+    fill: C.pd, 'fill-opacity': 0.1, stroke: C.pd, 'stroke-width': 2 }, S3.bar));
+  S3.segL = [...Array(NP)].map((_, i) => tx(S3.bar, 0, BY + 70, `P${i}`, { size: 26, family: MONO, weight: 600, fill: C.pd }));
+  S3.l0 = tx(g, X0, BY - 44, '0', { size: 22, family: MONO, fill: C.dim, anchor: 'start' });
+  S3.l1 = tx(g, X1, BY - 44, '0xFFFF', { size: 22, family: MONO, fill: C.dim, anchor: 'end' });
+  S3.bits = tx(g, 960, BY - 44, '16-bit code range', { size: 22, family: MONO, fill: C.dim });
+  S3.marker = el('g', { opacity: 0 }, g);
+  el('path', { d: 'M -12 -20 L 12 -20 L 0 0 Z', fill: C.lead }, S3.marker);
+  el('line', { x1: 0, y1: 0, x2: 0, y2: 44, stroke: C.lead, 'stroke-width': 3 }, S3.marker);
+  S3.flow = line(g, 520, 250, 635, 250, { stroke: C.dim, w: 2 });
+  S3.flow2 = line(g, 885, 250, 1000, 250, { stroke: C.dim, w: 2 });
+  const sx = [560, 960, 1360];
+  S3.stores = sx.map((x, i) => box(g, { x, y: 720, w: 340, h: 210, color: C.store, label: `Store ${i + 1}`, size: 26 }));
+  S3.stores.forEach(b => set(b.lab, { y: 650 }));
+  S3.leaderOf = [0, 1, 2, 0];
+  S3.reps = [];
+  for (let p = 0; p < NP; p++) for (let s = 0; s < 3; s++) {
+    const c = chip(g, `P${p}`, C.pd, { size: 24, w: 108, h: 50 });
+    const lc = chip(g, `P${p}`, C.lead, { size: 24, w: 108, h: 50, solid: true });
+    S3.reps.push({ p, s, c, lc, tx: sx[s] - 66 + (p % 2) * 132, ty: 718 + Math.floor(p / 2) * 66 });
+  }
+  S3.legend = el('g', { opacity: 0 }, g);
+  const lc = chip(S3.legend, 'leader', C.lead, { size: 20, solid: true });
+  lc.at(1690, 690);
+  const fc = chip(S3.legend, 'replica', C.pd, { size: 20 });
+  fc.at(1690, 750);
+  S3.segX = (i, gap) => {
+    const w = (X1 - X0 - gap * (NP - 1)) / NP;
+    return [X0 + i * (w + gap), w];
+  };
+  S3.render = t => {
+    const s = SC.partitions;
+    const tKey = s.start + 0.1, tHash = W('partitions', 'hashes'), tCode = W('partitions', '16-bit');
+    const tSplit = W('partitions', 'splits'), tPlace = W('partitions', 'places'), tLead = W('partitions', 'leader');
+    const kk = P(t, tKey, 0.6);
+    S3.key.at(390, 250, kk, lerp(0.9, 1, kk));
+    S3.hash.show(P(t, tKey + 0.2, 0.7));
+    set(S3.hashT, { opacity: P(t, tKey + 0.5, 0.5) });
+    drawLine(S3.flow, P(t, tHash - 0.2, 0.4));
+    drawLine(S3.flow2, P(t, tCode - 0.3, 0.4));
+    const kc = P(t, tCode - 0.2, 0.6, back);
+    const codeX = X0 + (X1 - X0) * CODE / 0x10000;
+    const kDrop = P(t, tCode + 0.5, 0.8, eio);
+    S3.code.at(lerp(1120, codeX, kDrop), lerp(250, BY - 90, kDrop), clamp(kc * 1.2), lerp(0.8, 1, clamp(kc)));
+    // the bar draws, then splits into partitions
+    const kb = P(t, tCode - 0.1, 0.9, eio);
+    const gap = 26 * P(t, tSplit - 0.1, 0.8, eio);
+    for (let i = 0; i < NP; i++) {
+      const [x, w] = S3.segX(i, gap);
+      const full = X1 - X0, start = X0 + full * 0, drawn = full * kb;
+      const vis = clamp(X0 + drawn - x, 0, w);
+      const hot = i === S3.part ? P(t, tSplit + 0.5, 0.5) : 0;
+      set(S3.segs[i], { x, width: Math.max(0, vis), opacity: vis > 0 ? 1 : 0,
+        'fill-opacity': 0.1 + 0.25 * hot, stroke: hot > 0.5 ? C.lead : C.pd });
+      set(S3.segL[i], { x: x + w / 2, opacity: P(t, tSplit + i * 0.1, 0.5) });
+    }
+    [S3.l0, S3.l1, S3.bits].forEach(e => set(e, { opacity: kb }));
+    set(S3.marker, { opacity: P(t, tCode + 1.1, 0.3), transform: `translate(${codeX} ${BY - 22})` });
+    S3.stores.forEach((b, i) => b.show(P(t, tPlace - 0.6 + i * 0.1, 0.7), 0.05));
+    S3.reps.forEach((r, n) => {
+      const [x, w] = S3.segX(r.p, gap);
+      const k = P(t, tPlace + 0.15 + r.p * 0.22 + r.s * 0.07, 0.9, eio);
+      const fx = lerp(x + w / 2, r.tx, k), fy = lerp(BY, r.ty, k) - Math.sin(k * Math.PI) * 60;
+      const isL = S3.leaderOf[r.p] === r.s;
+      const kl = isL ? P(t, tLead - 0.15 + r.p * 0.08, 0.4) : 0;
+      r.c.at(fx, fy, k > 0 ? clamp(k * 3) * (1 - kl) : 0, lerp(0.6, 1, k));
+      r.lc.at(fx, fy, kl, 1 + 0.12 * Math.sin(clamp((t - tLead - r.p * 0.08) / 0.4) * Math.PI));
+    });
+    set(S3.legend, { opacity: P(t, tLead, 0.5) });
+  };
+})();
+
+// ---------- scene 4: heartbeats ----------
+const S4 = {};
+(() => {
+  const g = layers.heartbeats;
+  const PD = [960, 300], sx = [470, 960, 1450], SY = 720;
+  S4.ripples = [0, 1, 2].map(() => el('circle', { cx: PD[0], cy: PD[1], r: 0, fill: 'none', stroke: C.pd, 'stroke-width': 2 }, g));
+  S4.links = sx.map(x => line(g, x, SY - 56, PD[0] + (x - 960) * 0.12, PD[1] + 86, { stroke: '#22404a', w: 2 }));
+  S4.pd = el('circle', { cx: PD[0], cy: PD[1], r: 0, fill: C.pd, 'fill-opacity': 0.1, stroke: C.pd, 'stroke-width': 3 }, g);
+  S4.pdT = tx(g, PD[0], PD[1] + 20, 'PD', { size: 56, weight: 800, fill: C.pd });
+  S4.stores = sx.map((x, i) => box(g, { x, y: SY, w: 270, h: 112, color: C.store, label: `Store ${i + 1}`, sub: 'ONLINE', size: 30 }));
+  S4.reg = sx.map(() => chip(g, 'RegisterStore', C.store, { size: 18 }));
+  S4.ids = sx.map((_, i) => chip(g, `id ${i + 1}`, C.pd, { size: 18 }));
+  S4.pulses = sx.map(() => [0, 1].map(() => el('circle', { r: 9, fill: C.store, opacity: 0 }, g)));
+  S4.hbLabel = tx(g, 1700, 500, 'StoreHeartbeat', { size: 22, family: MONO, fill: C.store, anchor: 'end' });
+  S4.instr = [['MovePartition', 0, 'move'], ['SplitPartition', 1, 'split'], ['TransferLeader', 2, 'transfer']]
+    .map(([n, s, w]) => ({ c: chip(g, n, C.pd, { size: 20, solid: true }), s, w }));
+  S4.stamp = el('g', { opacity: 0 }, g);
+  el('rect', { x: -110, y: -30, width: 220, height: 60, rx: 8, fill: 'none', stroke: C.bad, 'stroke-width': 4 }, S4.stamp);
+  tx(S4.stamp, 0, 12, 'OFFLINE', { size: 34, weight: 800, fill: C.bad, family: MONO, ls: 4 });
+  S4.zz = tx(g, sx[2] + 120, SY - 86, '…', { size: 48, fill: C.dim, anchor: 'start' });
+  const along = (i, k) => {
+    const l = S4.links[i];
+    const x1 = +l.getAttribute('x1'), y1 = +l.getAttribute('y1'), x2 = +l.getAttribute('x2'), y2 = +l.getAttribute('y2');
+    return [lerp(x1, x2, k), lerp(y1, y2, k)];
+  };
+  S4.render = t => {
+    const s = SC.heartbeats;
+    const tReg = W('heartbeats', 'register'), tHb = W('heartbeats', 'heartbeats');
+    const tIns = W('heartbeats', 'instructions'), tQuiet = W('heartbeats', 'quiet'), tOff = W('heartbeats', 'offline');
+    const kpd = P(t, s.start + 0.05, 0.7, back);
+    set(S4.pd, { r: 86 * kpd });
+    set(S4.pdT, { opacity: P(t, s.start + 0.3, 0.4) });
+    S4.stores.forEach((b, i) => b.show(P(t, s.start + 0.2 + i * 0.12, 0.7)));
+    S4.links.forEach((l, i) => drawLine(l, P(t, tReg - 0.4 + i * 0.1, 0.5)));
+    // registration: request up, id back down
+    sx.forEach((x, i) => {
+      const a = tReg + i * 0.18, k = P(t, a, 0.8, eio), kb = P(t, a + 0.9, 0.6, eio);
+      const [ux, uy] = along(i, k);
+      S4.reg[i].at(ux, uy, k > 0 && k < 1 ? 1 : 0);
+      const [dx, dy] = along(i, 1 - kb);
+      S4.ids[i].at(dx, dy, kb > 0 && kb < 1 ? 1 : 0);
+    });
+    // heartbeats: each store pulses up its link until it goes quiet
+    const period = 1.05, travel = 0.62, stop = [Infinity, Infinity, tQuiet - 0.4];
+    let lastArrive = [];
+    sx.forEach((x, i) => {
+      const first = tHb - 0.3 + i * 0.3;
+      const n = Math.floor((t - first) / period);
+      S4.pulses[i].forEach((d, j) => {
+        const m = n - j, st = first + m * period;
+        const k = (t - st) / travel;
+        const ok = m >= 0 && st < stop[i] && k >= 0 && k <= 1;
+        const [px, py] = along(i, eio(clamp(k)));
+        set(d, { cx: px, cy: py, opacity: ok ? 1 - 0.3 * k : 0 });
+        if (m >= 0 && st < stop[i] && t >= st + travel) lastArrive.push(st + travel);
+      });
+    });
+    const arrivals = lastArrive.sort((a, b) => b - a).slice(0, 3);
+    S4.ripples.forEach((r, j) => {
+      const a = arrivals[j];
+      const k = a === undefined ? 1 : clamp((t - a) / 0.8);
+      set(r, { r: 86 + 60 * eo(k), opacity: (1 - k) * 0.7 * kpd });
+    });
+    set(S4.hbLabel, { opacity: P(t, tHb, 0.5) * (1 - P(t, tIns - 0.3, 0.4)) });
+    // instructions travel down inside the heartbeat answer
+    S4.instr.forEach(({ c, s: si, w }) => {
+      const a = W('heartbeats', w) - 0.25, k = P(t, a, 0.9, eio);
+      const [x, y] = along(si, 1 - k * 0.78);
+      const fade = 1 - P(t, tQuiet - 0.2, 0.5);
+      c.at(x, y, (k > 0 ? 1 : 0) * fade, lerp(0.7, 1, k));
+    });
+    const ko = P(t, tOff - 0.1, 0.35, back);
+    const b3 = S4.stores[2];
+    const dead = P(t, tQuiet, 0.8);
+    set(b3.r, { stroke: dead > 0.5 ? C.bad : C.store, 'stroke-opacity': 1 - 0.4 * dead });
+    b3.sub.textContent = ko > 0.3 ? 'OFFLINE' : 'ONLINE';
+    set(b3.sub, { fill: ko > 0.3 ? C.bad : C.store });
+    set(b3.lab, { opacity: 1 - 0.5 * dead });
+    set(S4.links[2], { stroke: dead > 0.5 ? '#4a2526' : '#22404a' });
+    set(S4.zz, { opacity: P(t, tQuiet - 0.1, 0.4) * (1 - ko) });
+    set(S4.stamp, { opacity: clamp(ko), transform: `translate(${sx[2]} ${SY + 110}) rotate(-6) scale(${lerp(1.6, 1, clamp(ko))})` });
+  };
+})();
+
+// ---------- scene 5: raft ----------
+const S5 = {};
+(() => {
+  const g = layers.raft;
+  const N = [[960, 250], [660, 560], [1260, 560]];
+  const ghosts = [[520, 300], [1400, 300]];
+  S5.edges = [[0, 1], [0, 2], [1, 2]].map(([a, b]) => line(g, ...N[a], ...N[b], { stroke: '#1f3d44', w: 2 }));
+  S5.ghosts = ghosts.map(([x, y]) => {
+    const gg = el('g', { opacity: 0 }, g);
+    el('circle', { cx: x, cy: y, r: 62, fill: 'none', stroke: C.pd, 'stroke-width': 2, 'stroke-dasharray': '8 8' }, gg);
+    tx(gg, x, y + 9, 'PD', { size: 28, weight: 700, fill: C.pd });
+    return gg;
+  });
+  S5.halo = el('circle', { r: 92, fill: 'none', stroke: C.lead, 'stroke-width': 4, opacity: 0 }, g);
+  S5.nodes = N.map(([x, y], i) => {
+    const gg = el('g', {}, g);
+    const c = el('circle', { cx: x, cy: y, r: 0, fill: C.pd, 'fill-opacity': 0.1, stroke: C.pd, 'stroke-width': 3 }, gg);
+    const t = tx(gg, x, y + 12, `PD ${i + 1}`, { size: 34, weight: 700 });
+    const db = el('g', { opacity: 0 }, gg);
+    const dx = x + 110, dy = y + 40;
+    el('ellipse', { cx: dx, cy: dy - 34, rx: 34, ry: 10, fill: C.bg, stroke: C.dim, 'stroke-width': 2 }, db);
+    el('path', { d: `M ${dx - 34} ${dy - 34} V ${dy + 20} A 34 10 0 0 0 ${dx + 34} ${dy + 20} V ${dy - 34}`, fill: 'none', stroke: C.dim, 'stroke-width': 2 }, db);
+    const fill = el('rect', { x: dx - 32, y: dy + 20, width: 64, height: 0, fill: C.pd, 'fill-opacity': 0.45 }, db);
+    tx(db, dx, dy + 58, 'RocksDB', { size: 18, family: MONO, fill: C.dim });
+    const log = [0, 1, 2].map(j => el('rect', { x: x - 60 + j * 42, y: y + 92, width: 36, height: 16, rx: 3, fill: C.pd, opacity: 0 }, gg));
+    const x2 = el('g', { opacity: 0 }, gg);
+    el('path', { d: `M ${x - 34} ${y - 34} L ${x + 34} ${y + 34} M ${x + 34} ${y - 34} L ${x - 34} ${y + 34}`, stroke: C.bad, 'stroke-width': 7, 'stroke-linecap': 'round' }, x2);
+    return { gg, c, t, db, fill, log, x2, x, y, dy };
+  });
+  S5.lib = tx(g, 960, 790, 'SOFA-JRaft', { size: 30, family: MONO, weight: 600, fill: C.pd, ls: 2 });
+  S5.term = tx(g, 960, 840, '', { size: 22, family: MONO, fill: C.dim });
+  S5.write = chip(g, 'metadata write', C.lead, { size: 20 });
+  S5.prop = [1, 2].map(() => el('circle', { r: 9, fill: C.pd, opacity: 0 }, g));
+  S5.vote = [0, 1].map(() => chip(g, 'vote', C.dim, { size: 18 }));
+  S5.leaderTag = chip(g, 'leader', C.lead, { size: 20, solid: true });
+  S5.timers = [1, 2].map(i => el('circle', { cx: N[i][0], cy: N[i][1], r: 80, fill: 'none', stroke: C.lead,
+    'stroke-width': 3, pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1, opacity: 0,
+    transform: `rotate(-90 ${N[i][0]} ${N[i][1]})` }, g));
+  S5.render = t => {
+    const s = SC.raft;
+    const tThree = W('raft', 'three'), tFive = W('raft', 'five'), tLib = W('raft', 'SOFA-JRaft');
+    const tWrite = W('raft', 'write'), tProp = W('raft', 'proposal'), tSaved = W('raft', 'saved');
+    const tFail = W('raft', 'fails'), tElect = W('raft', 'elect'), tNew = W('raft', 'new');
+    S5.nodes.forEach((n, i) => {
+      const k = P(t, s.start + 0.1 + i * 0.15, 0.7, back);
+      set(n.c, { r: 70 * Math.max(0, k) });
+      set(n.t, { opacity: clamp(k) });
+    });
+    S5.edges.forEach((e, i) => drawLine(e, P(t, tThree - 0.2 + i * 0.1, 0.6)));
+    S5.ghosts.forEach((gg, i) => set(gg, { opacity: P(t, tFive - 0.1 + i * 0.1, 0.4) * (1 - P(t, tLib + 0.3, 0.5)) }));
+    set(S5.lib, { opacity: P(t, tLib - 0.1, 0.5), transform: `translate(0 ${(1 - P(t, tLib - 0.1, 0.5)) * 14})` });
+    // leader: PD 1 until it fails, then PD 3 after the election
+    const failed = t >= tFail;
+    const newLead = t >= tNew - 0.05;
+    const L = newLead ? 2 : 0;
+    const kHalo = newLead ? P(t, tNew - 0.05, 0.5, back) : P(t, tThree, 0.5) * (1 - P(t, tFail, 0.3));
+    set(S5.halo, { cx: N[L][0], cy: N[L][1], opacity: clamp(kHalo), r: 92 * lerp(0.8, 1, clamp(kHalo)) });
+    S5.leaderTag.at(N[L][0], N[L][1] - 118, clamp(kHalo));
+    set(S5.term, { opacity: P(t, tThree, 0.5) });
+    S5.term.textContent = newLead ? 'term 2 · leader PD 3' : (failed ? 'term 1 · no leader' : 'term 1 · leader PD 1');
+    // write: client sends to leader, leader replicates, every node appends and persists
+    const kw = P(t, tWrite - 0.3, 0.8, eio);
+    S5.write.at(lerp(520, 740, kw), lerp(140, 196, kw), kw > 0 ? clamp(kw * 3) * (1 - P(t, tProp, 0.3)) : 0);
+    S5.prop.forEach((d, j) => {
+      const k = P(t, tProp + 0.1, 0.7, eio);
+      const to = N[j + 1];
+      set(d, { cx: lerp(N[0][0], to[0], k), cy: lerp(N[0][1], to[1], k), opacity: k > 0 && k < 1 ? 1 : 0 });
+    });
+    S5.nodes.forEach((n, i) => {
+      const k = P(t, tProp + (i ? 0.8 : 0.05), 0.3);
+      n.log.forEach((r, j) => set(r, { opacity: j < 2 ? P(t, s.start + 0.6, 0.4) * 0.35 : k }));
+      const kd = P(t, tSaved - 0.1 + i * 0.1, 0.5);
+      set(n.db, { opacity: kd });
+      const kf = P(t, tSaved + 0.2 + i * 0.1, 0.7);
+      set(n.fill, { y: n.dy + 20 - 46 * kf, height: 46 * kf });
+    });
+    // failure and election
+    const kx = P(t, tFail, 0.35, back);
+    const n0 = S5.nodes[0];
+    set(n0.x2, { opacity: clamp(kx) });
+    set(n0.c, { stroke: failed ? C.bad : C.pd, 'stroke-opacity': failed ? 0.6 : 1 });
+    set(n0.t, { opacity: failed ? 0.45 : P(t, s.start + 0.1, 0.7) });
+    [0, 1].forEach(j => drawLine(S5.edges[j], failed ? 1 - 0.75 * P(t, tFail, 0.4) : P(t, tThree - 0.2 + j * 0.1, 0.6)));
+    S5.timers.forEach((c, j) => {
+      const dur = j === 1 ? 0.9 : 1.3;
+      const k = clamp((t - tFail - 0.15) / dur);
+      set(c, { 'stroke-dashoffset': 1 - k, opacity: t > tFail + 0.15 && t < tNew - 0.05 ? 0.9 : 0 });
+    });
+    const kv = P(t, tElect - 0.05, 0.5, eio), kr = P(t, tElect + 0.45, 0.45, eio);
+    S5.vote[0].at(lerp(N[2][0], N[1][0], kv), N[1][1] - 26, kv > 0 && kv < 1 ? 1 : 0);
+    S5.vote[1].at(lerp(N[1][0], N[2][0], kr), N[1][1] + 26, kr > 0 && kr < 1 ? 1 : 0);
+    set(S5.vote[1].t, { fill: C.store }); set(S5.vote[1].r, { stroke: C.store });
+  };
+})();
+
+// ---------- scene 6: routing ----------
+const S6 = {};
+(() => {
+  const g = layers.routing;
+  const SV = [400, 520], PD = [960, 260], ST = [[1520, 360], [1520, 540], [1520, 720]];
+  const PART = S3.part, LEAD = S3.leaderOf[PART];
+  S6.ask = line(g, SV[0] + 140, SV[1] - 60, PD[0] - 130, PD[1] + 20, { stroke: '#3a3260', w: 2 });
+  S6.data = el('line', { x1: SV[0] + 150, y1: SV[1] + 40, x2: ST[LEAD][0] - 150, y2: ST[LEAD][1], stroke: C.store,
+    'stroke-width': 6, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 }, g);
+  S6.packets = [...Array(6)].map(() => el('circle', { r: 7, fill: C.text, opacity: 0 }, g));
+  S6.ctl = ST.map(([x, y]) => line(g, PD[0] + 120, PD[1] + 30, x - 150, y - 20, { stroke: '#1f3d44', w: 1.5, dash: '0.012 0.012' }));
+  S6.server = box(g, { ...{ x: SV[0], y: SV[1], w: 300, h: 140 }, color: C.server, label: 'Server', sub: 'hstore backend' });
+  S6.pd = box(g, { x: PD[0], y: PD[1], w: 260, h: 120, color: C.pd, label: 'PD', size: 44 });
+  S6.stores = ST.map(([x, y], i) => box(g, { x, y, w: 300, h: 120, color: C.store, label: `Store ${i + 1}`, size: 30 }));
+  S6.q = chip(g, 'where is key "marko"?', C.server, { size: 20 });
+  S6.a = chip(g, `P${PART} · leader Store ${LEAD + 1}`, C.pd, { size: 20 });
+  S6.cache = chip(g, `cache  P${PART} → Store ${LEAD + 1}`, C.lead, { size: 20 });
+  S6.ctlL = tx(g, PD[0], PD[1] - 92, 'control plane', { size: 22, family: MONO, fill: C.dim });
+  S6.dataL = tx(g, 960, 700, 'data path', { size: 24, family: MONO, fill: C.store, weight: 600 });
+  S6.render = t => {
+    const s = SC.routing;
+    const tAsk = W('routing', 'ask'), tLives = W('routing', 'lives'), tCache = W('routing', 'cache');
+    const tTalk = W('routing', 'talk'), tStays = W('routing', 'stays');
+    S6.server.show(P(t, s.start + 0.05, 0.7));
+    S6.pd.show(P(t, s.start + 0.2, 0.7), 0.09);
+    S6.stores.forEach((b, i) => b.show(P(t, s.start + 0.3 + i * 0.1, 0.7)));
+    S6.ctl.forEach((l, i) => drawLine(l, P(t, s.start + 0.6 + i * 0.1, 0.6)));
+    drawLine(S6.ask, P(t, tAsk - 0.3, 0.5));
+    const [ax, ay, bx, by] = [SV[0] + 140, SV[1] - 60, PD[0] - 130, PD[1] + 20];
+    const kq = P(t, tAsk - 0.1, 0.9, eio);
+    S6.q.at(lerp(ax, bx, kq), lerp(ay, by, kq) - 34, kq > 0 && kq < 1 ? 1 : 0);
+    const ka = P(t, tLives + 0.1, 0.9, eio);
+    S6.a.at(lerp(bx, ax, ka), lerp(by, ay, ka) + 34, ka > 0 && ka < 1 ? 1 : 0);
+    const kc = P(t, tCache - 0.1, 0.5, back);
+    S6.cache.at(SV[0], SV[1] + 120, clamp(kc), lerp(0.7, 1, clamp(kc)));
+    const kd = P(t, tTalk - 0.2, 0.8, eio);
+    set(S6.data, { 'stroke-dashoffset': 1 - kd, opacity: kd > 0 ? 0.85 : 0 });
+    const x1 = SV[0] + 150, y1 = SV[1] + 40, x2 = ST[LEAD][0] - 150, y2 = ST[LEAD][1];
+    S6.packets.forEach((p, j) => {
+      const u = ((t - tTalk) * 0.55 + j / 6) % 1;
+      set(p, { cx: lerp(x1, x2, u), cy: lerp(y1, y2, u), opacity: t > tTalk + 0.6 ? 0.9 * Math.sin(u * Math.PI) : 0 });
+    });
+    const s3 = S6.stores[LEAD];
+    set(s3.r, { 'fill-opacity': 0.07 + 0.12 * P(t, tTalk + 0.4, 0.5) });
+    const kq2 = P(t, tStays - 0.1, 0.6);
+    set(S6.pd.g, { opacity: 1 - 0.55 * kq2 });
+    S6.ctl.forEach(l => set(l, { opacity: 1 - 0.6 * kq2 }));
+    set(S6.ask, { opacity: (S6.ask.getAttribute('opacity') > 0 ? 1 : 0) * (1 - 0.6 * kq2) });
+    set(S6.ctlL, { opacity: kq2 });
+    set(S6.dataL, { opacity: P(t, tStays + 0.3, 0.6) });
+  };
+})();
+
+// ---------- captions ----------
+const cap = document.getElementById('cap');
+const capLines = [];
+for (const s of TL.scenes) for (const l of s.lines) {
+  const d = document.createElement('div');
+  const spans = l.map((w, i) => {
+    if (i) d.appendChild(document.createTextNode(' '));
+    const sp = document.createElement('span');
+    sp.textContent = w.t;
+    d.appendChild(sp);
+    return sp;
+  });
+  cap.appendChild(d);
+  capLines.push({ d, spans, words: l, start: l[0].start, scene: s });
+}
+capLines.forEach((c, i) => {
+  const next = capLines[i + 1];
+  c.end = next && next.scene === c.scene ? next.start - 0.32 : c.scene.voiceEnd + 0.25;
+});
+function renderCaptions(t) {
+  for (const c of capLines) {
+    const kin = P(t, c.start - 0.15, 0.2), kout = P(t, c.end, 0.15);
+    const op = kin * (1 - kout);
+    c.d.style.opacity = op;
+    c.d.style.transform = `translateY(${(1 - kin) * 14}px)`;
+    if (op <= 0) continue;
+    c.words.forEach((w, i) => {
+      const said = t >= w.start, now = said && t < w.end + 0.05;
+      c.spans[i].style.color = now ? C.pd : (said ? C.text : '#56616e');
+    });
+  }
+}
+
+// ---------- frame ----------
+const SCENES = { intro: S1, roles: S2, partitions: S3, heartbeats: S4, raft: S5, routing: S6 };
+const endEls = ['end1', 'end2', 'end3'].map(id => document.getElementById(id));
+const introEls = [document.getElementById('title'), S1.tag, S1.tag2box];
+function renderAt(t) {
+  t = clamp(t, 0, TL.total);
+  set(grid, { transform: `translate(${(t * 7) % 48} ${(t * 4) % 48})` });
+  set(glowBg, { opacity: 0.7 + 0.3 * Math.sin(t * 0.8) });
+  const endAt = TL.total - TL.outro;
+  let cur = 0;
+  TL.scenes.forEach((s, i) => {
+    if (t >= s.start - 0.05) cur = i;
+    const kin = i === 0 ? 1 : P(t, s.start - 0.3, 0.55, eio);
+    const kout = i === TL.scenes.length - 1 ? P(t, endAt - 0.2, 0.5, eio) : P(t, s.end - 0.2, 0.45, eio);
+    const op = kin * (1 - kout);
+    set(layers[s.id], { opacity: op, transform: `translate(960 540) scale(${lerp(1.025, 1, kin) * lerp(1, 0.97, kout)}) translate(-960 -540)` });
+    if (op > 0) SCENES[s.id].render(t);
+  });
+  const introOp = 1 - P(t, SC.intro.end - 0.2, 0.45, eio);
+  introEls.forEach(e => { e.style.opacity = introOp; e.style.transform = `translateY(${-30 * (1 - introOp)}px)`; });
+  const s = TL.scenes[cur];
+  const hudK = cur === 0 ? P(t, SC.intro.end - 0.2, 0.5) : 1;
+  const hudOut = 1 - P(t, endAt - 0.2, 0.5);
+  set(hud, { opacity: hudK * hudOut });
+  hudNum.textContent = `${String(cur + 1).padStart(2, '0')} / ${String(TL.scenes.length).padStart(2, '0')}`;
+  hudName.textContent = s.title.toUpperCase();
+  set(prog, { width: 1920 * t / TL.total });
+  renderCaptions(t);
+  endEls.forEach((e, i) => {
+    const k = P(t, endAt + 0.1 + i * 0.18, 0.6);
+    e.style.opacity = k;
+    e.style.transform = `translateY(${(1 - k) * 24}px)`;
+  });
+}
+window.renderAt = renderAt;
+window.TL = TL;
+
+// ---------- preview ----------
+const q = new URLSearchParams(location.search);
+document.fonts.ready.then(() => {
+  if (q.has('play')) {
+    const t0 = performance.now();
+    const tick = () => { const t = (performance.now() - t0) / 1000; renderAt(t); if (t < TL.total) requestAnimationFrame(tick); };
+    tick();
+  } else {
+    renderAt(parseFloat(q.get('t') || '0'));
+  }
+  window.READY = true;
+});
+</script>
+</body>
+</html>

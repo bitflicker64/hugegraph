@@ -1,0 +1,43 @@
+{
+  "voice": "af_heart",
+  "speed": 1.12,
+  "gap_seconds": 0.4,
+  "scenes": [
+    {
+      "id": "intro",
+      "title": "HugeGraph PD",
+      "spoken": "This is Huge Graph P D, the Placement Driver: the control plane of a distributed Huge Graph cluster.",
+      "caption": "This is HugeGraph PD, the Placement Driver: the control plane of a distributed HugeGraph cluster."
+    },
+    {
+      "id": "roles",
+      "title": "Three roles",
+      "spoken": "Servers run graph queries. Stores hold the graph data. P D holds only the metadata: which stores are alive, and where every partition lives.",
+      "caption": "Servers run graph queries. Stores hold the graph data. PD holds only the metadata: which stores are alive, and where every partition lives."
+    },
+    {
+      "id": "partitions",
+      "title": "Partitions",
+      "spoken": "Every key hashes to a sixteen-bit code. P D splits that range into partitions, and places each partition's replicas on different stores, one as the leader.",
+      "caption": "Every key hashes to a 16-bit code. PD splits that range into partitions, and places each partition's replicas on different stores, one as the leader."
+    },
+    {
+      "id": "heartbeats",
+      "title": "Heartbeats",
+      "spoken": "Stores register with P D and send heartbeats. P D answers with instructions: move a partition, split it, or transfer its leader. A store that goes quiet is marked offline.",
+      "caption": "Stores register with PD and send heartbeats. PD answers with instructions: move a partition, split it, or transfer its leader. A store that goes quiet is marked offline."
+    },
+    {
+      "id": "raft",
+      "title": "Raft",
+      "spoken": "P D itself runs as three or five nodes on Sofa J Raft. Every metadata write is a Raft proposal, saved in Rocks D B. If the leader fails, the others elect a new one.",
+      "caption": "PD itself runs as three or five nodes on SOFA-JRaft. Every metadata write is a Raft proposal, saved in RocksDB. If the leader fails, the others elect a new one."
+    },
+    {
+      "id": "routing",
+      "title": "Routing",
+      "spoken": "Servers ask P D where a key lives, cache the answer, and talk to that store directly. P D stays out of the data path.",
+      "caption": "Servers ask PD where a key lives, cache the answer, and talk to that store directly. PD stays out of the data path."
+    }
+  ]
+}
